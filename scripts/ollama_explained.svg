@@ -1,0 +1,361 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1400" font-family="'Segoe UI',Arial,sans-serif">
+<rect width="1500" height="1400" fill="#0d1117" rx="14"/>
+
+<!-- ═══════════════════════════════════════════════════════ TITLE -->
+<text x="750" y="38" text-anchor="middle" font-size="22" font-weight="bold" fill="#e2e8f0">AI Models, Formats, GPU Compute &amp; Inference Engines — Field Guide</text>
+<text x="750" y="58" text-anchor="middle" font-size="12" fill="#64748b">Everything you need to understand what runs what, and why</text>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 1: THREE CONCEPT BOXES -->
+
+<!-- BOX A: Model Types -->
+<rect x="20" y="72" width="460" height="290" rx="8" fill="#1e293b" stroke="#334155"/>
+<rect x="20" y="72" width="460" height="30" rx="8" fill="#1e3a5f"/>
+<rect x="20" y="90" width="460" height="12" fill="#1e3a5f"/>
+<text x="250" y="93" text-anchor="middle" font-size="14" font-weight="bold" fill="#93c5fd">① What kinds of AI models exist?</text>
+
+<!-- Chat/Instruction -->
+<rect x="32" y="110" width="435" height="58" rx="5" fill="#0f172a" stroke="#2563eb"/>
+<text x="44" y="128" font-size="12" font-weight="bold" fill="#93c5fd">Chat / Instruction model</text>
+<text x="44" y="144" font-size="11" fill="#94a3b8">Trained to follow instructions and hold a conversation. You ask, it answers.</text>
+<text x="44" y="158" font-size="11" fill="#64748b">Examples in our stack: mistral:7b · phi3:mini · qwen2.5:3b</text>
+
+<!-- Reasoning -->
+<rect x="32" y="174" width="435" height="58" rx="5" fill="#0f172a" stroke="#7c3aed"/>
+<text x="44" y="192" font-size="12" font-weight="bold" fill="#c4b5fd">Reasoning model  (chain-of-thought)</text>
+<text x="44" y="208" font-size="11" fill="#94a3b8">Thinks step-by-step before answering — shows its work. Slower but much</text>
+<text x="44" y="222" font-size="11" fill="#94a3b8">smarter on math, logic, coding. Examples: deepseek-r1:8b · deepseek-r1:14b</text>
+
+<!-- Code/SQL -->
+<rect x="32" y="238" width="210" height="58" rx="5" fill="#0f172a" stroke="#059669"/>
+<text x="44" y="256" font-size="12" font-weight="bold" fill="#6ee7b7">Code / SQL model</text>
+<text x="44" y="272" font-size="11" fill="#94a3b8">Fine-tuned on code or SQL.</text>
+<text x="44" y="286" font-size="11" fill="#94a3b8">Example: sqlcoder2</text>
+
+<!-- Embedding -->
+<rect x="252" y="238" width="215" height="58" rx="5" fill="#0f172a" stroke="#0891b2"/>
+<text x="264" y="256" font-size="12" font-weight="bold" fill="#67e8f9">Embedding model</text>
+<text x="264" y="272" font-size="11" fill="#94a3b8">Converts text → vector numbers.</text>
+<text x="264" y="286" font-size="11" fill="#94a3b8">Used for search/RAG, not chat.</text>
+
+<!-- Multimodal note -->
+<rect x="32" y="302" width="435" height="50" rx="5" fill="#0f172a" stroke="#334155" stroke-dasharray="4,3"/>
+<text x="44" y="320" font-size="11" fill="#475569">Not in our stack: Multimodal (text+images), Speech-to-text, Text-to-speech,</text>
+<text x="44" y="336" font-size="11" fill="#475569">Diffusion (image generation). All different model architectures entirely.</text>
+<text x="44" y="350" font-size="11" fill="#334155">— — — — — — — — — — — — — — — — — — — — — — — — — — — — —</text>
+
+<!-- BOX B: File Formats -->
+<rect x="495" y="72" width="510" height="290" rx="8" fill="#1e293b" stroke="#334155"/>
+<rect x="495" y="72" width="510" height="30" rx="8" fill="#1a2e1a"/>
+<rect x="495" y="90" width="510" height="12" fill="#1a2e1a"/>
+<text x="750" y="93" text-anchor="middle" font-size="14" font-weight="bold" fill="#86efac">② File formats — how model weights are stored on disk</text>
+
+<!-- GGUF -->
+<rect x="507" y="110" width="244" height="100" rx="5" fill="#0f172a" stroke="#86efac"/>
+<text x="519" y="128" font-size="12" font-weight="bold" fill="#86efac">GGUF</text>
+<text x="519" y="144" font-size="10" fill="#64748b">llama.cpp · used by Ollama</text>
+<text x="519" y="160" font-size="11" fill="#94a3b8">Quantized (Q4/Q5). One file.</text>
+<text x="519" y="175" font-size="11" fill="#94a3b8">Runs on CPU or GPU.</text>
+<text x="519" y="190" font-size="11" fill="#94a3b8">What we use for LLMs.</text>
+
+<!-- SafeTensors -->
+<rect x="759" y="110" width="234" height="100" rx="5" fill="#0f172a" stroke="#fbbf24"/>
+<text x="771" y="128" font-size="12" font-weight="bold" fill="#fbbf24">SafeTensors</text>
+<text x="771" y="144" font-size="10" fill="#64748b">HuggingFace standard</text>
+<text x="771" y="160" font-size="11" fill="#94a3b8">Full precision or BF16.</text>
+<text x="771" y="175" font-size="11" fill="#94a3b8">Used by vLLM, LightLLM.</text>
+<text x="771" y="190" font-size="11" fill="#94a3b8">Larger files than GGUF.</text>
+
+<!-- ONNX -->
+<rect x="507" y="218" width="244" height="100" rx="5" fill="#0f172a" stroke="#a78bfa"/>
+<text x="519" y="236" font-size="12" font-weight="bold" fill="#a78bfa">ONNX</text>
+<text x="519" y="252" font-size="10" fill="#64748b">Open Neural Network Exchange</text>
+<text x="519" y="268" font-size="11" fill="#94a3b8">Hardware-neutral format.</text>
+<text x="519" y="283" font-size="11" fill="#94a3b8">Great for CPU inference.</text>
+<text x="519" y="298" font-size="11" fill="#94a3b8">KB-BERT runs via ONNX.</text>
+
+<!-- PyTorch -->
+<rect x="759" y="218" width="234" height="100" rx="5" fill="#0f172a" stroke="#475569"/>
+<text x="771" y="236" font-size="12" font-weight="bold" fill="#94a3b8">PyTorch .bin / .pt</text>
+<text x="771" y="252" font-size="10" fill="#475569">Legacy training format</text>
+<text x="771" y="268" font-size="11" fill="#64748b">Original weight files from</text>
+<text x="771" y="283" font-size="11" fill="#64748b">training. Being replaced by</text>
+<text x="771" y="298" font-size="11" fill="#64748b">SafeTensors everywhere.</text>
+
+<!-- BOX C: GPU Compute — ROCm -->
+<rect x="1020" y="72" width="460" height="290" rx="8" fill="#1e293b" stroke="#f97316"/>
+<rect x="1020" y="72" width="460" height="30" rx="8" fill="#431407"/>
+<rect x="1020" y="90" width="460" height="12" fill="#431407"/>
+<text x="1250" y="93" text-anchor="middle" font-size="14" font-weight="bold" fill="#fb923c">③ ROCm — NOT a format. It's a GPU driver platform.</text>
+
+<text x="1032" y="118" font-size="11" fill="#94a3b8">The model file (GGUF) stays the same. ROCm changes whether your</text>
+<text x="1032" y="133" font-size="11" fill="#94a3b8">AMD GPU is used for the computation. Think: same MP4 video file,</text>
+<text x="1032" y="148" font-size="11" fill="#94a3b8">but with/without GPU hardware decoding.</text>
+
+<!-- Without ROCm -->
+<rect x="1032" y="158" width="205" height="80" rx="5" fill="#0f172a" stroke="#475569"/>
+<text x="1134" y="176" text-anchor="middle" font-size="12" font-weight="bold" fill="#94a3b8">Without ROCm</text>
+<text x="1134" y="194" text-anchor="middle" font-size="11" fill="#94a3b8">CPU only</text>
+<text x="1134" y="210" text-anchor="middle" font-size="11" fill="#64748b">Works. ~3–10 tok/s</text>
+<text x="1134" y="225" text-anchor="middle" font-size="11" fill="#64748b">Any machine</text>
+
+<!-- With ROCm -->
+<rect x="1247" y="158" width="221" height="80" rx="5" fill="#0f172a" stroke="#f97316"/>
+<text x="1357" y="176" text-anchor="middle" font-size="12" font-weight="bold" fill="#fb923c">With ROCm (AMD)</text>
+<text x="1357" y="194" text-anchor="middle" font-size="11" fill="#fb923c">GPU accelerated</text>
+<text x="1357" y="210" text-anchor="middle" font-size="11" fill="#94a3b8">~30–100 tok/s</text>
+<text x="1357" y="225" text-anchor="middle" font-size="11" fill="#94a3b8">Radeon 890M (T14s)</text>
+
+<!-- CUDA vs ROCm -->
+<rect x="1032" y="247" width="436" height="70" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="1250" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="#e2e8f0">ROCm vs CUDA — same idea, different GPU brand</text>
+<text x="1044" y="284" font-size="11" fill="#94a3b8">CUDA = NVIDIA's GPU compute platform (GeForce, RTX, Tesla)</text>
+<text x="1044" y="300" font-size="11" fill="#fb923c">ROCm = AMD's GPU compute platform (Radeon, Instinct) — what we have</text>
+<text x="1044" y="316" font-size="11" fill="#64748b">Both are invisible to the model. They are how the CPU talks to the GPU.</text>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 2: INFERENCE ENGINE TABLE -->
+<rect x="20" y="375" width="1460" height="195" rx="8" fill="#1e293b" stroke="#334155"/>
+<rect x="20" y="375" width="1460" height="30" rx="8" fill="#1e293b"/>
+<rect x="20" y="393" width="1460" height="12" fill="#1e293b"/>
+<text x="750" y="396" text-anchor="middle" font-size="14" font-weight="bold" fill="#e2e8f0">④ Inference Engines — what software runs the models</text>
+
+<!-- Table header -->
+<rect x="32" y="410" width="1436" height="24" rx="3" fill="#0f172a"/>
+<text x="130" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">ENGINE</text>
+<text x="310" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">FORMAT</text>
+<text x="490" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">GPU SUPPORT</text>
+<text x="680" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">BEST FOR</text>
+<text x="950" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">MODELS IN OUR STACK</text>
+<text x="1310" y="426" text-anchor="middle" font-size="11" font-weight="bold" fill="#64748b">USED IN AIRGAP?</text>
+
+<!-- Row: Ollama -->
+<rect x="32" y="436" width="1436" height="26" rx="2" fill="#0c1829"/>
+<text x="130" y="453" text-anchor="middle" font-size="11" font-weight="bold" fill="#3b82f6">Ollama</text>
+<text x="310" y="453" text-anchor="middle" font-size="11" fill="#86efac">GGUF</text>
+<text x="490" y="453" text-anchor="middle" font-size="11" fill="#fb923c">CUDA · ROCm · CPU</text>
+<text x="680" y="453" text-anchor="middle" font-size="11" fill="#94a3b8">Local, easy, one model at a time</text>
+<text x="950" y="453" text-anchor="middle" font-size="11" fill="#94a3b8">All 7 LLMs</text>
+<text x="1310" y="453" text-anchor="middle" font-size="12" fill="#86efac">✓ YES — primary engine</text>
+
+<!-- Row: vLLM -->
+<rect x="32" y="464" width="1436" height="26" rx="2" fill="#0f172a"/>
+<text x="130" y="481" text-anchor="middle" font-size="11" font-weight="bold" fill="#fbbf24">vLLM</text>
+<text x="310" y="481" text-anchor="middle" font-size="11" fill="#fbbf24">SafeTensors</text>
+<text x="490" y="481" text-anchor="middle" font-size="11" fill="#fb923c">CUDA · ROCm</text>
+<text x="680" y="481" text-anchor="middle" font-size="11" fill="#94a3b8">High-throughput server, many users</text>
+<text x="950" y="481" text-anchor="middle" font-size="11" fill="#94a3b8">deepseek, mistral, phi3, qwen (needs HF weights)</text>
+<text x="1310" y="481" text-anchor="middle" font-size="11" fill="#64748b">Not yet — needs SafeTensors downloads</text>
+
+<!-- Row: LightLLM -->
+<rect x="32" y="492" width="1436" height="26" rx="2" fill="#0c1829"/>
+<text x="130" y="509" text-anchor="middle" font-size="11" font-weight="bold" fill="#fbbf24">LightLLM</text>
+<text x="310" y="509" text-anchor="middle" font-size="11" fill="#fbbf24">SafeTensors</text>
+<text x="490" y="509" text-anchor="middle" font-size="11" fill="#64748b">CUDA (mainly)</text>
+<text x="680" y="509" text-anchor="middle" font-size="11" fill="#94a3b8">High-throughput, similar to vLLM</text>
+<text x="950" y="509" text-anchor="middle" font-size="11" fill="#94a3b8">deepseek, mistral, phi3, qwen (needs HF weights)</text>
+<text x="1310" y="509" text-anchor="middle" font-size="11" fill="#64748b">Not yet — needs SafeTensors downloads</text>
+
+<!-- Row: ONNX Runtime -->
+<rect x="32" y="520" width="1436" height="26" rx="2" fill="#0f172a"/>
+<text x="130" y="537" text-anchor="middle" font-size="11" font-weight="bold" fill="#a78bfa">ONNX Runtime</text>
+<text x="310" y="537" text-anchor="middle" font-size="11" fill="#a78bfa">ONNX</text>
+<text x="490" y="537" text-anchor="middle" font-size="11" fill="#94a3b8">CUDA · ROCm · CPU</text>
+<text x="680" y="537" text-anchor="middle" font-size="11" fill="#94a3b8">Edge, CPU-first, embedding models</text>
+<text x="950" y="537" text-anchor="middle" font-size="11" fill="#94a3b8">KB-BERT, sentence-BERT (our Rust kb_bert_onnx project)</text>
+<text x="1310" y="537" text-anchor="middle" font-size="12" fill="#86efac">✓ YES — for BERT embeddings</text>
+
+<!-- Row: HF Transformers -->
+<rect x="32" y="548" width="1436" height="16" rx="2" fill="#0c1829"/>
+<text x="130" y="560" text-anchor="middle" font-size="11" font-weight="bold" fill="#94a3b8">HF Transformers</text>
+<text x="310" y="560" text-anchor="middle" font-size="11" fill="#fbbf24">SafeTensors / PyTorch</text>
+<text x="490" y="560" text-anchor="middle" font-size="11" fill="#94a3b8">CUDA · ROCm · CPU</text>
+<text x="680" y="560" text-anchor="middle" font-size="11" fill="#94a3b8">Research, fine-tuning, all model types</text>
+<text x="950" y="560" text-anchor="middle" font-size="11" fill="#94a3b8">KB-BERT, sentence-BERT, sqlcoder-7b-2 (raw HF weights)</text>
+<text x="1310" y="560" text-anchor="middle" font-size="12" fill="#86efac">✓ YES — KB-BERT via Python</text>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 3: OUR MODELS -->
+<text x="750" y="598" text-anchor="middle" font-size="14" font-weight="bold" fill="#e2e8f0">⑤ Models in our airgap stack</text>
+
+<!-- deepseek-r1:14b -->
+<rect x="20" y="608" width="215" height="155" rx="6" fill="#1e293b" stroke="#2563eb" stroke-width="1.5"/>
+<rect x="20" y="608" width="215" height="26" rx="6" fill="#1d4ed8"/>
+<rect x="20" y="625" width="215" height="9" fill="#1d4ed8"/>
+<text x="127" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">deepseek-r1:14b</text>
+<text x="32" y="646" font-size="10" font-weight="bold" fill="#93c5fd">Type</text><text x="80" y="646" font-size="10" fill="#94a3b8">Reasoning (CoT)</text>
+<text x="32" y="661" font-size="10" font-weight="bold" fill="#93c5fd">Made by</text><text x="80" y="661" font-size="10" fill="#94a3b8">DeepSeek AI 🇨🇳</text>
+<text x="32" y="676" font-size="10" font-weight="bold" fill="#93c5fd">License</text><text x="80" y="676" font-size="10" fill="#86efac">MIT (open)</text>
+<text x="32" y="691" font-size="10" font-weight="bold" fill="#93c5fd">Format</text><text x="80" y="691" font-size="10" fill="#86efac">GGUF Q4</text>
+<text x="32" y="706" font-size="10" font-weight="bold" fill="#93c5fd">Engine</text><text x="80" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="32" y="721" font-size="10" font-weight="bold" fill="#93c5fd">RAM</text><text x="80" y="721" font-size="10" fill="#fca5a5">~9 GB (tight)</text>
+<text x="32" y="736" font-size="10" font-weight="bold" fill="#93c5fd">ROCm</text><text x="80" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="32" y="751" font-size="10" font-weight="bold" fill="#93c5fd">vLLM?</text><text x="80" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- deepseek-r1:8b -->
+<rect x="245" y="608" width="215" height="155" rx="6" fill="#1e293b" stroke="#2563eb" stroke-width="1.5"/>
+<rect x="245" y="608" width="215" height="26" rx="6" fill="#1d4ed8"/>
+<rect x="245" y="625" width="215" height="9" fill="#1d4ed8"/>
+<text x="352" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">deepseek-r1:8b</text>
+<text x="257" y="646" font-size="10" font-weight="bold" fill="#93c5fd">Type</text><text x="305" y="646" font-size="10" fill="#94a3b8">Reasoning (CoT)</text>
+<text x="257" y="661" font-size="10" font-weight="bold" fill="#93c5fd">Made by</text><text x="305" y="661" font-size="10" fill="#94a3b8">DeepSeek AI 🇨🇳</text>
+<text x="257" y="676" font-size="10" font-weight="bold" fill="#93c5fd">License</text><text x="305" y="676" font-size="10" fill="#86efac">MIT (open)</text>
+<text x="257" y="691" font-size="10" font-weight="bold" fill="#93c5fd">Format</text><text x="305" y="691" font-size="10" fill="#86efac">GGUF Q4</text>
+<text x="257" y="706" font-size="10" font-weight="bold" fill="#93c5fd">Engine</text><text x="305" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="257" y="721" font-size="10" font-weight="bold" fill="#93c5fd">RAM</text><text x="305" y="721" font-size="10" fill="#86efac">~5 GB (fits well)</text>
+<text x="257" y="736" font-size="10" font-weight="bold" fill="#93c5fd">ROCm</text><text x="305" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="257" y="751" font-size="10" font-weight="bold" fill="#93c5fd">vLLM?</text><text x="305" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- mistral:7b -->
+<rect x="470" y="608" width="215" height="155" rx="6" fill="#1e293b" stroke="#7c3aed" stroke-width="1.5"/>
+<rect x="470" y="608" width="215" height="26" rx="6" fill="#6d28d9"/>
+<rect x="470" y="625" width="215" height="9" fill="#6d28d9"/>
+<text x="577" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">mistral:7b</text>
+<text x="482" y="646" font-size="10" font-weight="bold" fill="#c4b5fd">Type</text><text x="530" y="646" font-size="10" fill="#94a3b8">Chat / Instruction</text>
+<text x="482" y="661" font-size="10" font-weight="bold" fill="#c4b5fd">Made by</text><text x="530" y="661" font-size="10" fill="#94a3b8">Mistral AI 🇫🇷</text>
+<text x="482" y="676" font-size="10" font-weight="bold" fill="#c4b5fd">License</text><text x="530" y="676" font-size="10" fill="#86efac">Apache 2.0 (open)</text>
+<text x="482" y="691" font-size="10" font-weight="bold" fill="#c4b5fd">Format</text><text x="530" y="691" font-size="10" fill="#86efac">GGUF Q4</text>
+<text x="482" y="706" font-size="10" font-weight="bold" fill="#c4b5fd">Engine</text><text x="530" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="482" y="721" font-size="10" font-weight="bold" fill="#c4b5fd">RAM</text><text x="530" y="721" font-size="10" fill="#86efac">~4.5 GB (fits well)</text>
+<text x="482" y="736" font-size="10" font-weight="bold" fill="#c4b5fd">ROCm</text><text x="530" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="482" y="751" font-size="10" font-weight="bold" fill="#c4b5fd">vLLM?</text><text x="530" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- sqlcoder2 -->
+<rect x="695" y="608" width="215" height="155" rx="6" fill="#1e293b" stroke="#059669" stroke-width="1.5"/>
+<rect x="695" y="608" width="215" height="26" rx="6" fill="#047857"/>
+<rect x="695" y="625" width="215" height="9" fill="#047857"/>
+<text x="802" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">sqlcoder2</text>
+<text x="707" y="646" font-size="10" font-weight="bold" fill="#6ee7b7">Type</text><text x="755" y="646" font-size="10" fill="#94a3b8">SQL / Code model</text>
+<text x="707" y="661" font-size="10" font-weight="bold" fill="#6ee7b7">Made by</text><text x="755" y="661" font-size="10" fill="#94a3b8">Defog AI 🇺🇸</text>
+<text x="707" y="676" font-size="10" font-weight="bold" fill="#6ee7b7">License</text><text x="755" y="676" font-size="10" fill="#86efac">Apache 2.0 (open)</text>
+<text x="707" y="691" font-size="10" font-weight="bold" fill="#6ee7b7">Format</text><text x="755" y="691" font-size="10" fill="#86efac">GGUF Q5</text>
+<text x="707" y="706" font-size="10" font-weight="bold" fill="#6ee7b7">Engine</text><text x="755" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="707" y="721" font-size="10" font-weight="bold" fill="#6ee7b7">RAM</text><text x="755" y="721" font-size="10" fill="#86efac">~4.5 GB (fits well)</text>
+<text x="707" y="736" font-size="10" font-weight="bold" fill="#6ee7b7">ROCm</text><text x="755" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="707" y="751" font-size="10" font-weight="bold" fill="#6ee7b7">vLLM?</text><text x="755" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- phi3:mini -->
+<rect x="920" y="608" width="185" height="155" rx="6" fill="#1e293b" stroke="#d97706" stroke-width="1.5"/>
+<rect x="920" y="608" width="185" height="26" rx="6" fill="#b45309"/>
+<rect x="920" y="625" width="185" height="9" fill="#b45309"/>
+<text x="1012" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">phi3:mini</text>
+<text x="932" y="646" font-size="10" font-weight="bold" fill="#fcd34d">Type</text><text x="970" y="646" font-size="10" fill="#94a3b8">Chat / Instruction</text>
+<text x="932" y="661" font-size="10" font-weight="bold" fill="#fcd34d">Made by</text><text x="970" y="661" font-size="10" fill="#94a3b8">Microsoft 🇺🇸</text>
+<text x="932" y="676" font-size="10" font-weight="bold" fill="#fcd34d">License</text><text x="970" y="676" font-size="10" fill="#86efac">MIT (open)</text>
+<text x="932" y="691" font-size="10" font-weight="bold" fill="#fcd34d">Format</text><text x="970" y="691" font-size="10" fill="#86efac">GGUF Q4</text>
+<text x="932" y="706" font-size="10" font-weight="bold" fill="#fcd34d">Engine</text><text x="970" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="932" y="721" font-size="10" font-weight="bold" fill="#fcd34d">RAM</text><text x="970" y="721" font-size="10" fill="#86efac">~2.3 GB (very light)</text>
+<text x="932" y="736" font-size="10" font-weight="bold" fill="#fcd34d">ROCm</text><text x="970" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="932" y="751" font-size="10" font-weight="bold" fill="#fcd34d">vLLM?</text><text x="970" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- qwen2.5:3b -->
+<rect x="1115" y="608" width="185" height="155" rx="6" fill="#1e293b" stroke="#db2777" stroke-width="1.5"/>
+<rect x="1115" y="608" width="185" height="26" rx="6" fill="#be185d"/>
+<rect x="1115" y="625" width="185" height="9" fill="#be185d"/>
+<text x="1207" y="625" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">qwen2.5:3b</text>
+<text x="1127" y="646" font-size="10" font-weight="bold" fill="#f9a8d4">Type</text><text x="1165" y="646" font-size="10" fill="#94a3b8">Chat / Multilingual</text>
+<text x="1127" y="661" font-size="10" font-weight="bold" fill="#f9a8d4">Made by</text><text x="1165" y="661" font-size="10" fill="#94a3b8">Alibaba 🇨🇳</text>
+<text x="1127" y="676" font-size="10" font-weight="bold" fill="#f9a8d4">License</text><text x="1165" y="676" font-size="10" fill="#fcd34d">Qwen (free/open)</text>
+<text x="1127" y="691" font-size="10" font-weight="bold" fill="#f9a8d4">Format</text><text x="1165" y="691" font-size="10" fill="#86efac">GGUF Q4</text>
+<text x="1127" y="706" font-size="10" font-weight="bold" fill="#f9a8d4">Engine</text><text x="1165" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="1127" y="721" font-size="10" font-weight="bold" fill="#f9a8d4">RAM</text><text x="1165" y="721" font-size="10" fill="#86efac">~2 GB (very light)</text>
+<text x="1127" y="736" font-size="10" font-weight="bold" fill="#f9a8d4">ROCm</text><text x="1165" y="736" font-size="10" fill="#fb923c">GPU if available</text>
+<text x="1127" y="751" font-size="10" font-weight="bold" fill="#f9a8d4">vLLM?</text><text x="1165" y="751" font-size="10" fill="#64748b">Yes (needs HF weights)</text>
+
+<!-- nomic-embed-text -->
+<rect x="1310" y="608" width="170" height="155" rx="6" fill="#1e293b" stroke="#0891b2" stroke-width="1.5"/>
+<rect x="1310" y="608" width="170" height="26" rx="6" fill="#0e7490"/>
+<rect x="1310" y="625" width="170" height="9" fill="#0e7490"/>
+<text x="1395" y="625" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">nomic-embed-text</text>
+<text x="1322" y="646" font-size="10" font-weight="bold" fill="#67e8f9">Type</text><text x="1360" y="646" font-size="10" fill="#94a3b8">Embedding</text>
+<text x="1322" y="661" font-size="10" font-weight="bold" fill="#67e8f9">Made by</text><text x="1360" y="661" font-size="10" fill="#94a3b8">Nomic AI 🇺🇸</text>
+<text x="1322" y="676" font-size="10" font-weight="bold" fill="#67e8f9">License</text><text x="1360" y="676" font-size="10" fill="#86efac">Apache 2.0</text>
+<text x="1322" y="691" font-size="10" font-weight="bold" fill="#67e8f9">Format</text><text x="1360" y="691" font-size="10" fill="#86efac">GGUF</text>
+<text x="1322" y="706" font-size="10" font-weight="bold" fill="#67e8f9">Engine</text><text x="1360" y="706" font-size="10" fill="#94a3b8">Ollama</text>
+<text x="1322" y="721" font-size="10" font-weight="bold" fill="#67e8f9">RAM</text><text x="1360" y="721" font-size="10" fill="#86efac">~0.3 GB (tiny)</text>
+<text x="1322" y="736" font-size="10" font-weight="bold" fill="#67e8f9">ROCm</text><text x="1360" y="736" font-size="10" fill="#94a3b8">CPU is fine</text>
+<text x="1322" y="751" font-size="10" font-weight="bold" fill="#67e8f9">vLLM?</text><text x="1360" y="751" font-size="10" fill="#f87171">No (embed only)</text>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 4: HF MODELS -->
+<text x="750" y="785" text-anchor="middle" font-size="13" font-weight="bold" fill="#e2e8f0">⑥ HuggingFace models (BERT-based — embedding + NER, not chat)</text>
+
+<!-- KB-BERT base -->
+<rect x="20" y="795" width="340" height="130" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+<rect x="20" y="795" width="340" height="24" rx="6" fill="#4c1d95"/>
+<rect x="20" y="810" width="340" height="9" fill="#4c1d95"/>
+<text x="190" y="812" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">KBLab/bert-base-swedish-cased</text>
+<text x="32" y="832" font-size="10" font-weight="bold" fill="#a78bfa">Type</text><text x="80" y="832" font-size="10" fill="#94a3b8">Embedding / NER — Swedish BERT</text>
+<text x="32" y="847" font-size="10" font-weight="bold" fill="#a78bfa">Made by</text><text x="80" y="847" font-size="10" fill="#94a3b8">KBLab / Kungliga biblioteket 🇸🇪</text>
+<text x="32" y="862" font-size="10" font-weight="bold" fill="#a78bfa">License</text><text x="80" y="862" font-size="10" fill="#86efac">Apache 2.0 (open)</text>
+<text x="32" y="877" font-size="10" font-weight="bold" fill="#a78bfa">Format</text><text x="80" y="877" font-size="10" fill="#a78bfa">SafeTensors → exported to ONNX</text>
+<text x="32" y="892" font-size="10" font-weight="bold" fill="#a78bfa">Engine</text><text x="80" y="892" font-size="10" fill="#94a3b8">ONNX Runtime · HF Transformers</text>
+<text x="32" y="907" font-size="10" font-weight="bold" fill="#a78bfa">vLLM?</text><text x="80" y="907" font-size="10" fill="#f87171">No — BERT is not generative</text>
+
+<!-- sentence-BERT -->
+<rect x="370" y="795" width="340" height="130" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+<rect x="370" y="795" width="340" height="24" rx="6" fill="#4c1d95"/>
+<rect x="370" y="810" width="340" height="9" fill="#4c1d95"/>
+<text x="540" y="812" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">KBLab/sentence-bert-swedish-cased</text>
+<text x="382" y="832" font-size="10" font-weight="bold" fill="#a78bfa">Type</text><text x="420" y="832" font-size="10" fill="#94a3b8">Sentence embeddings — Swedish</text>
+<text x="382" y="847" font-size="10" font-weight="bold" fill="#a78bfa">Made by</text><text x="420" y="847" font-size="10" fill="#94a3b8">KBLab / Kungliga biblioteket 🇸🇪</text>
+<text x="382" y="862" font-size="10" font-weight="bold" fill="#a78bfa">License</text><text x="420" y="862" font-size="10" fill="#86efac">Apache 2.0 (open)</text>
+<text x="382" y="877" font-size="10" font-weight="bold" fill="#a78bfa">Format</text><text x="420" y="877" font-size="10" fill="#a78bfa">SafeTensors + GGUF (BF16)</text>
+<text x="382" y="892" font-size="10" font-weight="bold" fill="#a78bfa">Engine</text><text x="420" y="892" font-size="10" fill="#94a3b8">ONNX Runtime · HF Transformers</text>
+<text x="382" y="907" font-size="10" font-weight="bold" fill="#a78bfa">Use</text><text x="420" y="907" font-size="10" fill="#94a3b8">RAG over Swedish documents</text>
+
+<!-- sqlcoder-7b-2 HF -->
+<rect x="720" y="795" width="340" height="130" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+<rect x="720" y="795" width="340" height="24" rx="6" fill="#1e293b"/>
+<rect x="720" y="810" width="340" height="9" fill="#1e293b"/>
+<text x="890" y="812" text-anchor="middle" font-size="12" font-weight="bold" fill="#e2e8f0">defog/sqlcoder-7b-2 (raw weights)</text>
+<text x="732" y="832" font-size="10" font-weight="bold" fill="#94a3b8">Type</text><text x="770" y="832" font-size="10" fill="#94a3b8">SQL model — same as sqlcoder2 in Ollama</text>
+<text x="732" y="847" font-size="10" font-weight="bold" fill="#94a3b8">Made by</text><text x="770" y="847" font-size="10" fill="#94a3b8">Defog AI 🇺🇸</text>
+<text x="732" y="862" font-size="10" font-weight="bold" fill="#94a3b8">Format</text><text x="770" y="862" font-size="10" fill="#fbbf24">SafeTensors + GGUF Q5 (both on disk)</text>
+<text x="732" y="877" font-size="10" font-weight="bold" fill="#94a3b8">Engine</text><text x="770" y="877" font-size="10" fill="#94a3b8">Ollama (GGUF) or vLLM (SafeTensors)</text>
+<text x="732" y="892" font-size="10" font-weight="bold" fill="#94a3b8">vLLM?</text><text x="770" y="892" font-size="10" fill="#86efac">Yes — SafeTensors already on disk</text>
+<text x="732" y="907" font-size="10" font-weight="bold" fill="#94a3b8">Size</text><text x="770" y="907" font-size="10" fill="#94a3b8">18 GB (full weights)</text>
+
+<!-- ONNX note -->
+<rect x="1070" y="795" width="410" height="130" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+<rect x="1070" y="795" width="410" height="24" rx="6" fill="#2e1065"/>
+<rect x="1070" y="810" width="410" height="9" fill="#2e1065"/>
+<text x="1275" y="812" text-anchor="middle" font-size="12" font-weight="bold" fill="#c4b5fd">Why ONNX for KB-BERT?</text>
+<text x="1082" y="832" font-size="11" fill="#94a3b8">KB-BERT is a BERT encoder — not generative, so Ollama/vLLM don't apply.</text>
+<text x="1082" y="849" font-size="11" fill="#94a3b8">ONNX lets the Rust project (kb_bert_onnx) run it via onnxruntime-rs</text>
+<text x="1082" y="866" font-size="11" fill="#94a3b8">without needing Python or PyTorch — fast, portable, CPU-friendly.</text>
+<text x="1082" y="883" font-size="11" fill="#94a3b8">Flow: SafeTensors → export to ONNX → run via ONNX Runtime in Rust.</text>
+<text x="1082" y="900" font-size="11" fill="#a78bfa">ROCm NOT needed — KB-BERT is tiny (124M params), CPU is fast enough.</text>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 5: BOTTOM BAR -->
+<rect x="20" y="942" width="1460" height="80" rx="6" fill="#1e293b" stroke="#334155"/>
+<text x="750" y="962" text-anchor="middle" font-size="13" font-weight="bold" fill="#e2e8f0">Quick decision guide</text>
+<text x="90"  y="982" text-anchor="middle" font-size="11" fill="#fcd34d">Chat in terminal?</text>
+<text x="90"  y="997" text-anchor="middle" font-size="11" fill="#94a3b8">ollama run phi3:mini</text>
+<text x="310" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">Hard reasoning?</text>
+<text x="310" y="997" text-anchor="middle" font-size="11" fill="#94a3b8">ollama run deepseek-r1:8b</text>
+<text x="540" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">Generate SQL?</text>
+<text x="540" y="997" text-anchor="middle" font-size="11" fill="#94a3b8">ollama run sqlcoder2</text>
+<text x="760" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">Search Swedish docs?</text>
+<text x="760" y="997" text-anchor="middle" font-size="11" fill="#94a3b8">nomic-embed-text + LanceDB</text>
+<text x="990" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">NER on Swedish text?</text>
+<text x="990" y="997" text-anchor="middle" font-size="11" fill="#94a3b8">KB-BERT via ONNX Runtime</text>
+<text x="1220" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">Many users, server?</text>
+<text x="1220" y="997" text-anchor="middle" font-size="11" fill="#94a3b8">vLLM (needs SafeTensors)</text>
+<text x="1420" y="982" text-anchor="middle" font-size="11" fill="#fcd34d">GPU slow?</text>
+<text x="1420" y="997" text-anchor="middle" font-size="11" fill="#fb923c">Check ROCm install</text>
+
+<!-- dividers -->
+<line x1="200" y1="970" x2="200" y2="1015" stroke="#334155" stroke-width="1"/>
+<line x1="425" y1="970" x2="425" y2="1015" stroke="#334155" stroke-width="1"/>
+<line x1="650" y1="970" x2="650" y2="1015" stroke="#334155" stroke-width="1"/>
+<line x1="875" y1="970" x2="875" y2="1015" stroke="#334155" stroke-width="1"/>
+<line x1="1100" y1="970" x2="1100" y2="1015" stroke="#334155" stroke-width="1"/>
+<line x1="1320" y1="970" x2="1320" y2="1015" stroke="#334155" stroke-width="1"/>
+
+<!-- ═══════════════════════════════════════════════════════ ROW 6: LICENSE KEY -->
+<rect x="20" y="1038" width="1460" height="48" rx="6" fill="#0f172a" stroke="#1e293b"/>
+<text x="32" y="1057" font-size="11" font-weight="bold" fill="#64748b">Licenses: </text>
+<text x="102" y="1057" font-size="11" fill="#86efac">MIT </text><text x="126" y="1057" font-size="10" fill="#64748b">— most permissive, use anywhere    </text>
+<text x="370" y="1057" font-size="11" fill="#86efac">Apache 2.0 </text><text x="442" y="1057" font-size="10" fill="#64748b">— free, open, patent protection    </text>
+<text x="680" y="1057" font-size="11" fill="#fcd34d">Qwen License </text><text x="764" y="1057" font-size="10" fill="#64748b">— free for most use, restrictions on large-scale deployment    </text>
+<text x="32" y="1075" font-size="11" font-weight="bold" fill="#64748b">Open-weight: </text>
+<text x="112" y="1075" font-size="10" fill="#94a3b8">All models here publish their weights publicly. You can run them, fine-tune them. "Open-weight" ≠ fully open-source (training code/data may be closed).</text>
+
+</svg>

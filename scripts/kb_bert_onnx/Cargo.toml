@@ -1,0 +1,19 @@
+[package]
+name    = "kb-bert-onnx"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# GPU-accelererad inference via ONNX Runtime (ROCm på Radeon 890M)
+ort         = { version = "2", features = ["load-dynamic"] }
+# Ren Rust-fallback (CPU, ingen .so krävs)
+tract-onnx  = "0.21"
+tract-ndarray = "0.21"
+# Tokenisering
+tokenizers  = "0.20"
+# Tensor-ops
+ndarray     = "0.16"
+half        = "2"      # FP16
+# Utilities
+anyhow      = "1"
+serde_json  = "1"

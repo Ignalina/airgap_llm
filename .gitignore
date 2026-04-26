@@ -1,0 +1,54 @@
+# ── Model weights & quantized files ──────────────────────────
+*.gguf
+*.ggml
+*.bin
+*.pt
+*.pth
+*.safetensors
+
+# ── Archives & binaries ───────────────────────────────────────
+*.tar
+*.tar.gz
+*.tgz
+*.tar.zst
+*.tar.xz
+*.zip
+*.zst
+*.gz
+*.xz
+
+# ── Packages ──────────────────────────────────────────────────
+*.whl
+*.deb
+*.rpm
+
+# ── Compiled / object files ───────────────────────────────────
+*.so
+*.o
+*.a
+*.dylib
+*.dll
+*.exe
+target/
+
+# ── Data & logs ───────────────────────────────────────────────
+*.parquet
+*.arrow
+*.log
+*.tmp
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ── T9 data directories — never pull in by accident ──────────
+/data/
+/models/
+/huggingface/
+/archive/
+/docker/
+/python/
+/rust/
+/java/

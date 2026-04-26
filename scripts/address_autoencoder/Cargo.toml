@@ -1,0 +1,13 @@
+[package]
+name    = "address-autoencoder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Burn for traning -- autograd, GRU, Linear, LayerNorm
+burn        = { version = "0.16", features = ["train", "wgpu", "autodiff"] }
+strsim      = "0.11"             # Jaro-Winkler som baseline-jamforelse
+unicode-normalization = "0.1"    # NFC/NFD for a/a/o
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+anyhow      = "1"
