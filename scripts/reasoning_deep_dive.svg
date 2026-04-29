@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 840" font-family="'Segoe UI',Arial,sans-serif">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L8,3.5 z" fill="#475569"/>
+  </marker>
+  <marker id="arrb" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L8,3.5 z" fill="#3b82f6"/>
+  </marker>
+  <marker id="arrg" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L8,3.5 z" fill="#059669"/>
+  </marker>
+</defs>
+<rect width="1400" height="840" fill="#0d1117" rx="14"/>
+
+<!-- Title -->
+<text x="700" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#e2e8f0">Reasoning Models — Black Box to White Box</text>
+<text x="700" y="48" text-anchor="middle" font-size="11" fill="#64748b">DeepSeek-R1 · Chain-of-Thought · GRPO training · Test-time compute</text>
+
+<!-- ═══════════════ PANEL 1: EXTERNAL VIEW ═══════════════ -->
+<rect x="16" y="60" width="680" height="358" rx="8" fill="#1e293b" stroke="#1e3a5f"/>
+<rect x="16" y="60" width="680" height="28" rx="8" fill="#1e3a5f"/>
+<rect x="16" y="76" width="680" height="12" fill="#1e3a5f"/>
+<text x="356" y="78" text-anchor="middle" font-size="13" font-weight="bold" fill="#93c5fd">① From outside: one API call, one token stream</text>
+
+<!-- HTTP call box -->
+<rect x="36" y="100" width="640" height="42" rx="5" fill="#0c1829" stroke="#2563eb"/>
+<text x="356" y="116" text-anchor="middle" font-size="11" font-weight="bold" fill="#3b82f6">POST /api/generate</text>
+<text x="356" y="134" text-anchor="middle" font-size="10" fill="#64748b">{model: "deepseek-r1:8b", prompt: "Hur många sekunder är det på ett år?", stream: true}</text>
+
+<text x="36" y="162" font-size="10" font-weight="bold" fill="#94a3b8">Token stream — everything generated in one continuous session:</text>
+
+<!-- Token stream: think open -->
+<rect x="36"  y="170" width="52" height="22" rx="3" fill="#1e1a2e" stroke="#7c3aed"/>
+<text x="62"  y="185" text-anchor="middle" font-size="9" fill="#a78bfa">&lt;think&gt;</text>
+
+<!-- reasoning tokens -->
+<rect x="93"  y="170" width="58" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="122" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">365 dagar</text>
+<rect x="156" y="170" width="36" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="174" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">×24=</text>
+<rect x="197" y="170" width="50" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="222" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">8 760 h</text>
+<rect x="252" y="170" width="36" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="270" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">×60=</text>
+<rect x="293" y="170" width="56" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="321" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">525 600</text>
+<rect x="354" y="170" width="36" height="22" rx="3" fill="#1e1a2e" stroke="#4c1d95"/>
+<text x="372" y="185" text-anchor="middle" font-size="9" fill="#c4b5fd">×60=</text>
+<text x="402" y="184" font-size="13" fill="#475569">…</text>
+
+<!-- think close -->
+<rect x="418" y="170" width="58" height="22" rx="3" fill="#1e1a2e" stroke="#7c3aed"/>
+<text x="447" y="185" text-anchor="middle" font-size="9" fill="#a78bfa">&lt;/think&gt;</text>
+
+<!-- answer tokens -->
+<rect x="481" y="170" width="56" height="22" rx="3" fill="#0f2d1a" stroke="#059669" stroke-width="1.5"/>
+<text x="509" y="185" text-anchor="middle" font-size="9" fill="#6ee7b7">31 536 000</text>
+<rect x="542" y="170" width="56" height="22" rx="3" fill="#0f2d1a" stroke="#059669" stroke-width="1.5"/>
+<text x="570" y="185" text-anchor="middle" font-size="9" fill="#6ee7b7">sekunder</text>
+<rect x="603" y="170" width="22" height="22" rx="3" fill="#0f2d1a" stroke="#059669" stroke-width="1.5"/>
+<text x="614" y="185" text-anchor="middle" font-size="9" fill="#6ee7b7">.</text>
+
+<!-- label bar -->
+<rect x="36"  y="196" width="436" height="10" rx="2" fill="#1e1a2e"/>
+<rect x="477" y="196" width="148" height="10" rx="2" fill="#0f2d1a"/>
+<text x="254" y="205" text-anchor="middle" font-size="8" fill="#7c3aed">reasoning scratchpad (200–3000 tokens typical)</text>
+<text x="551" y="205" text-anchor="middle" font-size="8" fill="#059669">answer (20–100 tok)</text>
+
+<!-- NOT multiple calls box -->
+<rect x="36" y="218" width="640" height="44" rx="5" fill="#0f172a" stroke="#f87171"/>
+<text x="356" y="234" text-anchor="middle" font-size="11" font-weight="bold" fill="#f87171">The model is NOT called once per reasoning step.</text>
+<text x="356" y="250" text-anchor="middle" font-size="10" fill="#94a3b8">All tokens — including every calculation inside &lt;think&gt; — stream from ONE generation session. No orchestration.</text>
+
+<!-- Why it helps -->
+<text x="36" y="282" font-size="10" font-weight="bold" fill="#94a3b8">Why writing steps helps (Wei et al. 2022 — arXiv:2201.11903):</text>
+
+<rect x="36" y="288" width="640" height="60" rx="5" fill="#0f172a" stroke="#2563eb"/>
+<text x="356" y="306" text-anchor="middle" font-size="10" fill="#94a3b8">Each token is predicted conditioned on ALL prior tokens in the stream.</text>
+<text x="356" y="321" text-anchor="middle" font-size="10" fill="#94a3b8">When the model writes "365 × 24 = 8 760", that value enters the KV-cache.</text>
+<text x="356" y="336" text-anchor="middle" font-size="10" fill="#93c5fd">Every later token attends to it — the calculation becomes part of the working context.</text>
+<text x="356" y="350" text-anchor="middle" font-size="10" fill="#64748b">More reasoning tokens = more intermediate compute = better answers on hard problems.</text>
+
+<!-- test-time compute -->
+<rect x="36" y="360" width="640" height="46" rx="5" fill="#1a1a0a" stroke="#f59e0b"/>
+<text x="356" y="376" text-anchor="middle" font-size="10" font-weight="bold" fill="#fcd34d">Test-time compute scaling (Snell et al. 2024 — arXiv:2408.03314)</text>
+<text x="356" y="391" text-anchor="middle" font-size="10" fill="#94a3b8">Longer reasoning traces = more "compute at inference". Trading latency for accuracy.</text>
+<text x="356" y="405" text-anchor="middle" font-size="9" fill="#64748b">Same insight as "think step by step" prompting — but baked into the model weights via RL training.</text>
+
+<!-- ═══════════════ PANEL 2: INSIDE THE MODEL ═══════════════ -->
+<rect x="710" y="60" width="674" height="358" rx="8" fill="#1e293b" stroke="#1a2e1a"/>
+<rect x="710" y="60" width="674" height="28" rx="8" fill="#1a2e1a"/>
+<rect x="710" y="76" width="674" height="12" fill="#1a2e1a"/>
+<text x="1047" y="78" text-anchor="middle" font-size="13" font-weight="bold" fill="#86efac">② Inside the transformer — autoregressive KV-cache loop</text>
+
+<!-- Loop boxes -->
+<rect x="730" y="100" width="175" height="65" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="817"  y="120" text-anchor="middle" font-size="10" font-weight="bold" fill="#e2e8f0">KV-cache</text>
+<text x="817"  y="134" text-anchor="middle" font-size="9" fill="#94a3b8">All previous tokens</text>
+<text x="817"  y="147" text-anchor="middle" font-size="9" fill="#64748b">(prompt + generated)</text>
+<text x="817"  y="159" text-anchor="middle" font-size="9" fill="#64748b">keys + values stored</text>
+
+<line x1="905" y1="132" x2="940" y2="132" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<rect x="940" y="100" width="185" height="65" rx="5" fill="#0f172a" stroke="#059669"/>
+<text x="1032"  y="120" text-anchor="middle" font-size="10" font-weight="bold" fill="#6ee7b7">Transformer layers</text>
+<text x="1032"  y="134" text-anchor="middle" font-size="9" fill="#94a3b8">N × (self-attention + FFN)</text>
+<text x="1032"  y="147" text-anchor="middle" font-size="9" fill="#64748b">each head attends to</text>
+<text x="1032"  y="159" text-anchor="middle" font-size="9" fill="#64748b">all cached K, V pairs</text>
+
+<line x1="1125" y1="132" x2="1160" y2="132" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<rect x="1160" y="100" width="200" height="65" rx="5" fill="#0f172a" stroke="#0891b2"/>
+<text x="1260"  y="120" text-anchor="middle" font-size="10" font-weight="bold" fill="#67e8f9">Next token</text>
+<text x="1260"  y="134" text-anchor="middle" font-size="9" fill="#94a3b8">linear → softmax → vocab</text>
+<text x="1260"  y="147" text-anchor="middle" font-size="9" fill="#64748b">sample or argmax</text>
+<text x="1260"  y="159" text-anchor="middle" font-size="9" fill="#64748b">→ emit, append, repeat</text>
+
+<!-- feedback arrow -->
+<path d="M 1260 165 L 1260 185 L 817 185 L 817 165" stroke="#475569" stroke-width="1" fill="none" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+<text x="1040" y="182" text-anchor="middle" font-size="8" fill="#475569">← token appended to cache, next iteration starts</text>
+
+<!-- KV-cache detail -->
+<rect x="730" y="198" width="630" height="55" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="1045" y="215" text-anchor="middle" font-size="10" font-weight="bold" fill="#e2e8f0">KV-cache: why reasoning tokens are "free" to reuse</text>
+<text x="740" y="231" font-size="10" fill="#94a3b8">Once "8 760" is cached, all future tokens attend to it at zero extra cost — it's already in memory.</text>
+<text x="740" y="244" font-size="10" fill="#64748b">The longer the reasoning trace, the more facts the final answer token can "see". No recomputation.</text>
+
+<!-- attention visualization -->
+<text x="730" y="267" font-size="9" font-weight="bold" fill="#64748b">Simplified attention: token "sekunder" attends strongly to earlier calculated values</text>
+<rect x="730" y="274" width="60" height="17" rx="2" fill="#1e1a2e" stroke="#4c1d95" opacity="0.5"/>
+<text x="760" y="286" text-anchor="middle" font-size="8" fill="#a78bfa">365×24</text>
+<rect x="795" y="274" width="52" height="17" rx="2" fill="#1e1a2e" stroke="#4c1d95" opacity="0.7"/>
+<text x="821" y="286" text-anchor="middle" font-size="8" fill="#a78bfa">8 760 h</text>
+<rect x="852" y="274" width="52" height="17" rx="2" fill="#1e1a2e" stroke="#4c1d95" opacity="0.7"/>
+<text x="878" y="286" text-anchor="middle" font-size="8" fill="#a78bfa">525 600</text>
+<rect x="909" y="274" width="68" height="17" rx="2" fill="#1e1a2e" stroke="#4c1d95" opacity="0.9"/>
+<text x="943" y="286" text-anchor="middle" font-size="8" fill="#c4b5fd">31 536 000</text>
+<text x="987" y="285" font-size="11" fill="#475569"> …</text>
+<rect x="1000" y="274" width="62" height="17" rx="2" fill="#0f2d1a" stroke="#059669" stroke-width="2"/>
+<text x="1031" y="286" text-anchor="middle" font-size="8" fill="#6ee7b7">sekunder</text>
+<!-- attention lines from "sekunder" back to computed values -->
+<line x1="1000" y1="282" x2="975" y2="291" stroke="#3b82f6" stroke-width="1.5" opacity="0.9"/>
+<line x1="1000" y1="282" x2="878" y2="291" stroke="#3b82f6" stroke-width="1.2" opacity="0.7"/>
+<line x1="1000" y1="282" x2="821" y2="291" stroke="#3b82f6" stroke-width="0.8" opacity="0.5"/>
+<text x="1031" y="302" text-anchor="middle" font-size="8" fill="#3b82f6">high attention weight</text>
+
+<!-- model size / layers note -->
+<rect x="730" y="310" width="630" height="42" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="740" y="327" font-size="10" font-weight="bold" fill="#94a3b8">deepseek-r1:8b  </text>
+<text x="840" y="327" font-size="10" fill="#64748b">8 billion parameters · 32 transformer layers · 4096 hidden dim · 32 attention heads</text>
+<text x="740" y="342" font-size="10" fill="#64748b">GGUF Q4_K_M quantization: weights stored in 4-bit integers → ~5 GB on disk, same architecture</text>
+<text x="740" y="357" font-size="10" fill="#64748b">deepseek-r1:14b  14B params · 40 layers · ~9 GB Q4 → use when 8b gets the reasoning wrong</text>
+
+<!-- ═══════════════ PANEL 3: TRAINING (GRPO) ═══════════════ -->
+<rect x="16" y="432" width="680" height="392" rx="8" fill="#1e293b" stroke="#2e1065"/>
+<rect x="16" y="432" width="680" height="28" rx="8" fill="#2e1065"/>
+<rect x="16" y="448" width="680" height="12" fill="#2e1065"/>
+<text x="356" y="450" text-anchor="middle" font-size="13" font-weight="bold" fill="#c4b5fd">③ Training — GRPO reinforcement learning (DeepSeek-R1)</text>
+
+<text x="36" y="477" font-size="10" fill="#94a3b8">Standard SFT models learn to mimic (prompt→answer) pairs. Reasoning models learn via RL: emit a trace, get rewarded only if correct.</text>
+
+<!-- GRPO steps -->
+<text x="36" y="500" font-size="10" font-weight="bold" fill="#64748b">Group Relative Policy Optimization loop (arXiv:2402.03300, arXiv:2501.12948):</text>
+
+<rect x="36"  y="508" width="140" height="56" rx="5" fill="#0f172a" stroke="#3b82f6"/>
+<text x="106" y="526" text-anchor="middle" font-size="10" font-weight="bold" fill="#3b82f6">1. Sample</text>
+<text x="106" y="541" text-anchor="middle" font-size="9" fill="#94a3b8">Generate G responses</text>
+<text x="106" y="555" text-anchor="middle" font-size="9" fill="#64748b">for the same prompt</text>
+
+<line x1="176" y1="536" x2="210" y2="536" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<rect x="210" y="508" width="140" height="56" rx="5" fill="#0f172a" stroke="#059669"/>
+<text x="280" y="526" text-anchor="middle" font-size="10" font-weight="bold" fill="#6ee7b7">2. Score</text>
+<text x="280" y="541" text-anchor="middle" font-size="9" fill="#94a3b8">Correct answer?</text>
+<text x="280" y="555" text-anchor="middle" font-size="9" fill="#64748b">r=1 yes · r=0 no</text>
+
+<line x1="350" y1="536" x2="384" y2="536" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<rect x="384" y="508" width="150" height="56" rx="5" fill="#0f172a" stroke="#f59e0b"/>
+<text x="459" y="526" text-anchor="middle" font-size="10" font-weight="bold" fill="#fcd34d">3. Normalize</text>
+<text x="459" y="541" text-anchor="middle" font-size="9" fill="#94a3b8">advantage = r − mean(G)</text>
+<text x="459" y="555" text-anchor="middle" font-size="9" fill="#64748b">no separate critic needed</text>
+
+<line x1="534" y1="536" x2="568" y2="536" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<rect x="568" y="508" width="108" height="56" rx="5" fill="#0f172a" stroke="#ec4899"/>
+<text x="622" y="526" text-anchor="middle" font-size="10" font-weight="bold" fill="#f9a8d4">4. Update</text>
+<text x="622" y="541" text-anchor="middle" font-size="9" fill="#94a3b8">reinforce traces</text>
+<text x="622" y="555" text-anchor="middle" font-size="9" fill="#64748b">with +advantage</text>
+
+<rect x="36" y="576" width="640" height="36" rx="4" fill="#1a0a2e" stroke="#7c3aed"/>
+<text x="356" y="592" text-anchor="middle" font-size="10" font-weight="bold" fill="#c4b5fd">Key insight: the model is never told what a "good" trace looks like.</text>
+<text x="356" y="606" text-anchor="middle" font-size="10" fill="#94a3b8">It discovers useful reasoning strategies purely from outcome rewards. The trace emerges from the policy, not supervision.</text>
+
+<!-- PRM vs ORM -->
+<rect x="36" y="624" width="308" height="80" rx="5" fill="#0f172a" stroke="#0891b2"/>
+<text x="190" y="641" text-anchor="middle" font-size="10" font-weight="bold" fill="#67e8f9">Process Reward Model (PRM)</text>
+<text x="46" y="656" font-size="9" fill="#94a3b8">Reward each reasoning step individually</text>
+<text x="46" y="669" font-size="9" fill="#94a3b8">More stable signal, harder to scale</text>
+<text x="46" y="682" font-size="9" fill="#64748b">Requires human-labelled step annotations</text>
+<text x="46" y="695" font-size="9" fill="#64748b">arXiv:2305.20050 — Lightman et al. 2023</text>
+
+<rect x="354" y="624" width="322" height="80" rx="5" fill="#0f172a" stroke="#7c3aed"/>
+<text x="515" y="641" text-anchor="middle" font-size="10" font-weight="bold" fill="#c4b5fd">Outcome Reward Model (ORM)</text>
+<text x="364" y="656" font-size="9" fill="#94a3b8">Reward only the final answer correctness</text>
+<text x="364" y="669" font-size="9" fill="#94a3b8">Simpler, scales well with GRPO sampling</text>
+<text x="364" y="682" font-size="9" fill="#64748b">What DeepSeek-R1 uses</text>
+<text x="364" y="695" font-size="9" fill="#64748b">arXiv:2501.12948 — DeepSeek-AI 2025</text>
+
+<rect x="36" y="716" width="640" height="32" rx="4" fill="#0f172a" stroke="#334155"/>
+<text x="356" y="730" text-anchor="middle" font-size="9" fill="#64748b">Also relevant: PPO (Schulman et al. 2017 · arXiv:1707.06347) — the earlier RL algorithm GRPO improves upon.</text>
+<text x="356" y="743" text-anchor="middle" font-size="9" fill="#64748b">CoT paper: Wei et al. 2022 · arXiv:2201.11903 — showed chain-of-thought emerges in large models.</text>
+
+<!-- ═══════════════ PANEL 4: MULTI-CALL APPROACHES ═══════════════ -->
+<rect x="710" y="432" width="674" height="392" rx="8" fill="#1e293b" stroke="#1a1a2e"/>
+<rect x="710" y="432" width="674" height="28" rx="8" fill="#1a1a2e"/>
+<rect x="710" y="448" width="674" height="12" fill="#1a1a2e"/>
+<text x="1047" y="450" text-anchor="middle" font-size="13" font-weight="bold" fill="#a78bfa">④ When the model IS called multiple times</text>
+
+<text x="730" y="474" font-size="10" fill="#94a3b8">These require an external orchestrator calling the Ollama API in a loop. Ollama does NOT do this on its own.</text>
+
+<!-- Self-consistency -->
+<rect x="730" y="484" width="630" height="96" rx="5" fill="#0f172a" stroke="#6366f1"/>
+<text x="1045" y="500" text-anchor="middle" font-size="10" font-weight="bold" fill="#a5b4fc">Self-Consistency — Wang et al. 2022 · arXiv:2203.11171</text>
+<text x="740" y="516" font-size="10" fill="#94a3b8">Prompt ──┬─ call 1 (temp=0.8) → "31 536 000"  ✓</text>
+<text x="740" y="530" font-size="10" fill="#94a3b8">         ├─ call 2 (temp=0.8) → "31 536 000"  ✓</text>
+<text x="740" y="544" font-size="10" fill="#94a3b8">         └─ call 3 (temp=0.8) → "31 622 400"  ✗</text>
+<text x="1050" y="516" font-size="10" fill="#86efac">→ majority vote: "31 536 000"</text>
+<text x="1050" y="530" font-size="10" fill="#64748b">N API calls · external orchestrator</text>
+<text x="1050" y="544" font-size="10" fill="#64748b">simple to implement, N× cost</text>
+<text x="740" y="570" font-size="9" fill="#64748b">Works well for math/factual tasks where there's one right answer. Cheap wins via sampling diversity.</text>
+
+<!-- Tree of Thoughts -->
+<rect x="730" y="590" width="630" height="110" rx="5" fill="#0f172a" stroke="#f59e0b"/>
+<text x="1045" y="607" text-anchor="middle" font-size="10" font-weight="bold" fill="#fcd34d">Tree of Thoughts — Yao et al. 2023 · arXiv:2305.10601</text>
+<text x="740" y="622" font-size="10" fill="#94a3b8">Branches reasoning into a tree. Evaluates intermediate states. Prunes bad branches.</text>
+<text x="740" y="636" font-size="10" fill="#64748b">Each node = one model call. Needs a separate evaluator (also the LLM) to score partial solutions.</text>
+<text x="740" y="650" font-size="10" fill="#64748b">Dramatic gains on creative writing, planning, puzzles where CoT alone fails.</text>
+<!-- simple tree sketch -->
+<circle cx="1250" cy="624" r="10" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1250" y="628" text-anchor="middle" font-size="8" fill="#fcd34d">Q</text>
+<line x1="1250" y1="634" x2="1218" y2="648" stroke="#475569" stroke-width="1"/>
+<line x1="1250" y1="634" x2="1250" y2="648" stroke="#475569" stroke-width="1"/>
+<line x1="1250" y1="634" x2="1282" y2="648" stroke="#475569" stroke-width="1"/>
+<circle cx="1218" cy="655" r="7" fill="#1e293b" stroke="#475569"/>
+<circle cx="1250" cy="655" r="7" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+<circle cx="1282" cy="655" r="7" fill="#1e293b" stroke="#475569"/>
+<text x="1250" y="659" text-anchor="middle" font-size="6" fill="#fcd34d">★</text>
+<line x1="1250" y1="662" x2="1238" y2="676" stroke="#475569" stroke-width="1"/>
+<line x1="1250" y1="662" x2="1264" y2="676" stroke="#475569" stroke-width="1"/>
+<circle cx="1238" cy="682" r="6" fill="#1e293b" stroke="#475569"/>
+<circle cx="1264" cy="682" r="6" fill="#0f2d1a" stroke="#059669" stroke-width="2"/>
+<line x1="1218" y1="662" x2="1218" y2="694" stroke="#64748b" stroke-width="0.8" stroke-dasharray="2,2"/>
+<text x="1215" y="700" font-size="7" fill="#475569">✗ pruned</text>
+<text x="740" y="690" font-size="9" fill="#64748b">Requires Python orchestrator calling /api/generate in a loop. Not built into Ollama.</text>
+
+<!-- Comparison table -->
+<rect x="730" y="712" width="630" height="100" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="1045" y="728" text-anchor="middle" font-size="10" font-weight="bold" fill="#e2e8f0">Quick comparison</text>
+
+<rect x="740" y="734" width="610" height="18" rx="2" fill="#0c1829"/>
+<text x="820"  y="746" text-anchor="middle" font-size="9" font-weight="bold" fill="#64748b">METHOD</text>
+<text x="1000" y="746" text-anchor="middle" font-size="9" font-weight="bold" fill="#64748b">CALLS</text>
+<text x="1140" y="746" text-anchor="middle" font-size="9" font-weight="bold" fill="#64748b">ORCHESTRATOR</text>
+<text x="1310" y="746" text-anchor="middle" font-size="9" font-weight="bold" fill="#64748b">COST</text>
+
+<text x="820"  y="764" text-anchor="middle" font-size="9" fill="#c4b5fd">DeepSeek-R1 CoT</text>
+<text x="1000" y="764" text-anchor="middle" font-size="9" fill="#86efac">1</text>
+<text x="1140" y="764" text-anchor="middle" font-size="9" fill="#86efac">none (Ollama)</text>
+<text x="1310" y="764" text-anchor="middle" font-size="9" fill="#94a3b8">1× token cost</text>
+
+<text x="820"  y="779" text-anchor="middle" font-size="9" fill="#a5b4fc">Self-consistency</text>
+<text x="1000" y="779" text-anchor="middle" font-size="9" fill="#fcd34d">N (e.g. 5–10)</text>
+<text x="1140" y="779" text-anchor="middle" font-size="9" fill="#fcd34d">Python loop</text>
+<text x="1310" y="779" text-anchor="middle" font-size="9" fill="#94a3b8">N× token cost</text>
+
+<text x="820"  y="794" text-anchor="middle" font-size="9" fill="#fcd34d">Tree of Thoughts</text>
+<text x="1000" y="794" text-anchor="middle" font-size="9" fill="#f87171">K^depth</text>
+<text x="1140" y="794" text-anchor="middle" font-size="9" fill="#f87171">complex orchestrator</text>
+<text x="1310" y="794" text-anchor="middle" font-size="9" fill="#f87171">high, tree-shaped</text>
+
+<text x="820"  y="809" text-anchor="middle" font-size="9" fill="#94a3b8">Ollama default</text>
+<text x="1000" y="809" text-anchor="middle" font-size="9" fill="#86efac">1</text>
+<text x="1140" y="809" text-anchor="middle" font-size="9" fill="#86efac">none</text>
+<text x="1310" y="809" text-anchor="middle" font-size="9" fill="#86efac">baseline</text>
+</svg>

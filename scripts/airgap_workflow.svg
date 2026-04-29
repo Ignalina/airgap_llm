@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 430" font-family="'Segoe UI',Arial,sans-serif">
+<defs>
+  <marker id="arr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L9,3.5 z" fill="#f59e0b"/>
+  </marker>
+  <marker id="arrd" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L9,3.5 z" fill="#475569"/>
+  </marker>
+</defs>
+<rect width="1100" height="430" fill="#0d1117" rx="14"/>
+
+<!-- Title -->
+<text x="550" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#e2e8f0">Airgap Two-Phase Workflow</text>
+<text x="550" y="48" text-anchor="middle" font-size="11" fill="#64748b">Online machine downloads everything → T9 USB drive carries it → T14s installs fully offline</text>
+
+<!-- ═══ LEFT: Online machine ═══ -->
+<rect x="20" y="62" width="430" height="310" rx="8" fill="#1e293b" stroke="#1e3a5f"/>
+<rect x="20" y="62" width="430" height="28" rx="8" fill="#1e3a5f"/>
+<rect x="20" y="78" width="430" height="12" fill="#1e3a5f"/>
+<text x="235" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#93c5fd">Online machine</text>
+
+<text x="40" y="108" font-size="11" font-weight="bold" fill="#94a3b8">prepare_airgap.sh</text>
+
+<rect x="40" y="115" width="390" height="38" rx="4" fill="#0f172a" stroke="#059669"/>
+<text x="50" y="132" font-size="10" font-weight="bold" fill="#6ee7b7">download_ollama</text>
+<text x="50" y="146" font-size="10" fill="#64748b">Ollama CPU + ROCm tarballs → archive/binaries/</text>
+
+<rect x="40" y="160" width="390" height="38" rx="4" fill="#0f172a" stroke="#3b82f6"/>
+<text x="50" y="177" font-size="10" font-weight="bold" fill="#93c5fd">pull_llm_models</text>
+<text x="50" y="191" font-size="10" fill="#64748b">ollama pull 7 models → models/ollama/ (GGUF files)</text>
+
+<rect x="40" y="205" width="390" height="38" rx="4" fill="#0f172a" stroke="#a78bfa"/>
+<text x="50" y="222" font-size="10" font-weight="bold" fill="#c4b5fd">download_hf_models</text>
+<text x="50" y="236" font-size="10" fill="#64748b">snapshot_download KB-BERT + sentence-BERT → huggingface/</text>
+
+<rect x="40" y="250" width="390" height="38" rx="4" fill="#0f172a" stroke="#f59e0b"/>
+<text x="50" y="267" font-size="10" font-weight="bold" fill="#fcd34d">pull_container_images</text>
+<text x="50" y="281" font-size="10" fill="#64748b">podman pull 5 images → docker/*.tar (Podman save)</text>
+
+<rect x="40" y="295" width="390" height="38" rx="4" fill="#0f172a" stroke="#475569"/>
+<text x="50" y="312" font-size="10" font-weight="bold" fill="#94a3b8">Python + Rust</text>
+<text x="50" y="326" font-size="10" fill="#64748b">pip download + cargo vendor → python/wheels/  rust/vendor/</text>
+
+<!-- CLI hint -->
+<rect x="40" y="342" width="390" height="24" rx="3" fill="#0c1829" stroke="#1e3a5f"/>
+<text x="235" y="358" text-anchor="middle" font-size="10" fill="#64748b">bash prepare_airgap.sh --dry-run  ← shows [✓] vs [✗]</text>
+
+<!-- ═══ CENTER: T9 USB ═══ -->
+<rect x="480" y="162" width="140" height="90" rx="8" fill="#1e2a1a" stroke="#f59e0b" stroke-width="2"/>
+<text x="550" y="188" text-anchor="middle" font-size="13" font-weight="bold" fill="#fcd34d">T9 USB</text>
+<text x="550" y="206" text-anchor="middle" font-size="11" fill="#94a3b8">~30–35 GB</text>
+<text x="550" y="221" text-anchor="middle" font-size="10" fill="#64748b">/airgap/ tree</text>
+<text x="550" y="236" text-anchor="middle" font-size="10" fill="#64748b">self-contained</text>
+
+<!-- arrows left→usb and usb→right -->
+<line x1="450" y1="207" x2="478" y2="207" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr)"/>
+<line x1="620" y1="207" x2="648" y2="207" stroke="#f59e0b" stroke-width="2" marker-end="url(#arr)"/>
+<text x="460" y="200" text-anchor="middle" font-size="9" fill="#f59e0b">copy</text>
+<text x="633" y="200" text-anchor="middle" font-size="9" fill="#f59e0b">plug in</text>
+
+<!-- ═══ RIGHT: T14s offline ═══ -->
+<rect x="650" y="62" width="430" height="310" rx="8" fill="#1e293b" stroke="#431407"/>
+<rect x="650" y="62" width="430" height="28" rx="8" fill="#431407"/>
+<rect x="650" y="78" width="430" height="12" fill="#431407"/>
+<text x="865" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#fb923c">T14s — offline (no internet)</text>
+
+<text x="670" y="108" font-size="11" font-weight="bold" fill="#94a3b8">install_on_t14s.sh</text>
+
+<rect x="670" y="115" width="390" height="38" rx="4" fill="#0f172a" stroke="#059669"/>
+<text x="680" y="132" font-size="10" font-weight="bold" fill="#6ee7b7">install_ollama</text>
+<text x="680" y="146" font-size="10" fill="#64748b">Unpack tarballs, set HSA_OVERRIDE_GFX_VERSION=11.0.0</text>
+
+<rect x="670" y="160" width="390" height="38" rx="4" fill="#0f172a" stroke="#3b82f6"/>
+<text x="680" y="177" font-size="10" font-weight="bold" fill="#93c5fd">register_models</text>
+<text x="680" y="191" font-size="10" fill="#64748b">ollama create from GGUF → available in ollama list</text>
+
+<rect x="670" y="205" width="390" height="38" rx="4" fill="#0f172a" stroke="#a78bfa"/>
+<text x="680" y="222" font-size="10" font-weight="bold" fill="#c4b5fd">install_hf_models</text>
+<text x="680" y="236" font-size="10" fill="#64748b">rsync huggingface/ → /data/huggingface/</text>
+
+<rect x="670" y="250" width="390" height="38" rx="4" fill="#0f172a" stroke="#f59e0b"/>
+<text x="680" y="267" font-size="10" font-weight="bold" fill="#fcd34d">load_containers</text>
+<text x="680" y="281" font-size="10" fill="#64748b">podman load &lt; docker/*.tar</text>
+
+<rect x="670" y="295" width="390" height="38" rx="4" fill="#0f172a" stroke="#475569"/>
+<text x="680" y="312" font-size="10" font-weight="bold" fill="#94a3b8">Python + Rust offline</text>
+<text x="680" y="326" font-size="10" fill="#64748b">pip install --no-index --find-links wheels/   cargo build --offline</text>
+
+<rect x="670" y="342" width="390" height="24" rx="3" fill="#0c1829" stroke="#431407"/>
+<text x="865" y="358" text-anchor="middle" font-size="10" fill="#64748b">bash verify_airgap.sh  ← read-only health check</text>
+
+<!-- ═══ Bottom: Directory layout brief ═══ -->
+<rect x="20" y="385" width="1060" height="34" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="30" y="400" font-size="10" font-weight="bold" fill="#64748b">/airgap/  </text>
+<text x="88" y="400" font-size="10" fill="#64748b">archive/apt+binaries    </text>
+<text x="88" y="413" font-size="10" fill="#64748b">docker/*.tar    </text>
+<text x="245" y="400" font-size="10" fill="#3b82f6">models/ollama/  </text>
+<text x="245" y="413" font-size="10" fill="#64748b">huggingface/    </text>
+<text x="430" y="400" font-size="10" fill="#a78bfa">python/wheels/  </text>
+<text x="430" y="413" font-size="10" fill="#a78bfa">rust/toolchain+vendor/  </text>
+<text x="660" y="400" font-size="10" fill="#64748b">git/  </text>
+<text x="660" y="413" font-size="10" fill="#64748b">scripts/    </text>
+<text x="750" y="400" font-size="10" fill="#f59e0b">Total ≈ 30–35 GB</text>
+<text x="750" y="413" font-size="10" fill="#64748b">fits on T9 USB  (idempotent — re-run skips existing files)</text>
+</svg>

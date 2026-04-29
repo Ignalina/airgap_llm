@@ -107,6 +107,15 @@ pull_llm_models() {
     check_model "deepseek-r1:8b"   "5 GB  — snabb reasoning"
     check_model "deepseek-r1:14b"  "9 GB  — tung reasoning"
 
+    # text-analysis GPU-tiers (selectModelGPU i hardware/detector.go)
+    # Väljs automatiskt baserat på VRAM/GTT — ladda alla tiers för portabilitet.
+    echo "  --- text-analysis: GPU-modeller (llama-server / HIP) ---"
+    check_model "llama3.1:70b"        "43 GB — GPU ≥ 40 GB  (t.ex. APU 53 GB GTT)"
+    check_model "qwen2.5:32b"         "19 GB — GPU ≥ 22 GB"
+    check_model "qwen2.5:14b"         "8.5 GB — GPU ≥ 10 GB"
+    check_model "llama3.1:8b"         "4.7 GB — GPU ≥ 5 GB"
+    check_model "mistral:7b-instruct" "4.1 GB — GPU < 5 GB / CPU-fallback"
+
     # Register a local GGUF as an Ollama model (skips registry)
     create_from_gguf() {
         local name=$1 gguf=$2 desc=$3

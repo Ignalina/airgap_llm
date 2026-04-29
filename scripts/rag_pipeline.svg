@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 530" font-family="'Segoe UI',Arial,sans-serif">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L8,3.5 z" fill="#475569"/>
+  </marker>
+  <marker id="arr2" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+    <path d="M0,0 L0,7 L8,3.5 z" fill="#3b82f6"/>
+  </marker>
+</defs>
+<rect width="1200" height="530" fill="#0d1117" rx="14"/>
+
+<!-- Title -->
+<text x="600" y="30" text-anchor="middle" font-size="19" font-weight="bold" fill="#e2e8f0">RAG Pipeline — Retrieval-Augmented Generation</text>
+<text x="600" y="48" text-anchor="middle" font-size="11" fill="#64748b">How embeddings + LanceDB + an LLM work together to answer questions about your documents</text>
+
+<!-- ═══ PANEL 1: INDEXING ═══ -->
+<rect x="16" y="60" width="1168" height="185" rx="7" fill="#1e293b" stroke="#1e3a5f"/>
+<rect x="16" y="60" width="1168" height="26" rx="7" fill="#1e3a5f"/>
+<rect x="16" y="74" width="1168" height="12" fill="#1e3a5f"/>
+<text x="600" y="77" text-anchor="middle" font-size="12" font-weight="bold" fill="#93c5fd">① INDEXING PHASE — done once (or whenever documents change)</text>
+
+<!-- Box: Raw documents -->
+<rect x="36" y="98" width="160" height="72" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="116" y="118" text-anchor="middle" font-size="11" font-weight="bold" fill="#e2e8f0">Raw documents</text>
+<text x="116" y="134" text-anchor="middle" font-size="10" fill="#94a3b8">PDF, TXT, HTML</text>
+<text x="116" y="148" text-anchor="middle" font-size="10" fill="#94a3b8">Swedish or any</text>
+<text x="116" y="162" text-anchor="middle" font-size="10" fill="#64748b">language</text>
+
+<line x1="196" y1="134" x2="228" y2="134" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Box: Chunker -->
+<rect x="228" y="98" width="160" height="72" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="308" y="118" text-anchor="middle" font-size="11" font-weight="bold" fill="#e2e8f0">Chunker</text>
+<text x="308" y="134" text-anchor="middle" font-size="10" fill="#94a3b8">Split into ~200–500</text>
+<text x="308" y="148" text-anchor="middle" font-size="10" fill="#94a3b8">token passages</text>
+<text x="308" y="162" text-anchor="middle" font-size="10" fill="#64748b">overlapping windows</text>
+
+<line x1="388" y1="134" x2="420" y2="134" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Box: Embedding model -->
+<rect x="420" y="98" width="190" height="72" rx="5" fill="#0f172a" stroke="#0891b2"/>
+<text x="515" y="118" text-anchor="middle" font-size="11" font-weight="bold" fill="#67e8f9">Embedding model</text>
+<text x="515" y="134" text-anchor="middle" font-size="10" fill="#94a3b8">nomic-embed-text</text>
+<text x="515" y="148" text-anchor="middle" font-size="10" fill="#94a3b8">or KB sentence-BERT</text>
+<text x="515" y="162" text-anchor="middle" font-size="10" fill="#64748b">text → float[768]</text>
+
+<line x1="610" y1="134" x2="642" y2="134" stroke="#475569" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Box: LanceDB -->
+<rect x="642" y="98" width="190" height="72" rx="5" fill="#0f172a" stroke="#059669"/>
+<text x="737" y="118" text-anchor="middle" font-size="11" font-weight="bold" fill="#6ee7b7">LanceDB</text>
+<text x="737" y="134" text-anchor="middle" font-size="10" fill="#94a3b8">Store vectors on disk</text>
+<text x="737" y="148" text-anchor="middle" font-size="10" fill="#94a3b8">+original text chunk</text>
+<text x="737" y="162" text-anchor="middle" font-size="10" fill="#64748b">columnar, local file</text>
+
+<!-- Note box -->
+<rect x="860" y="98" width="310" height="72" rx="5" fill="#0f172a" stroke="#334155" stroke-dasharray="4,3"/>
+<text x="1015" y="116" text-anchor="middle" font-size="10" font-weight="bold" fill="#64748b">In our stack</text>
+<text x="870" y="131" font-size="10" fill="#94a3b8">Swedish docs → sentence-BERT-swedish-cased</text>
+<text x="870" y="146" font-size="10" fill="#94a3b8">General docs → nomic-embed-text (via Ollama)</text>
+<text x="870" y="161" font-size="10" fill="#64748b">Vectors stored at /data/lancedb</text>
+
+<!-- Labels below boxes -->
+<text x="116" y="185" text-anchor="middle" font-size="9" fill="#64748b">input</text>
+<text x="308" y="185" text-anchor="middle" font-size="9" fill="#64748b">split</text>
+<text x="515" y="185" text-anchor="middle" font-size="9" fill="#0891b2">encode</text>
+<text x="737" y="185" text-anchor="middle" font-size="9" fill="#059669">persist</text>
+
+<!-- ═══ PANEL 2: QUERY ═══ -->
+<rect x="16" y="258" width="1168" height="218" rx="7" fill="#1e293b" stroke="#1e3a5f"/>
+<rect x="16" y="258" width="1168" height="26" rx="7" fill="#1e3a5f"/>
+<rect x="16" y="272" width="1168" height="12" fill="#1e3a5f"/>
+<text x="600" y="275" text-anchor="middle" font-size="12" font-weight="bold" fill="#93c5fd">② QUERY PHASE — runs on every user request</text>
+
+<!-- Box: User query -->
+<rect x="36" y="295" width="140" height="72" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="106" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#e2e8f0">User query</text>
+<text x="106" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">"barnbidrag</text>
+<text x="106" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">regler 2024"</text>
+<text x="106" y="359" text-anchor="middle" font-size="10" fill="#64748b">plain text</text>
+
+<line x1="176" y1="331" x2="208" y2="331" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+<!-- Box: Embedding -->
+<rect x="208" y="295" width="155" height="72" rx="5" fill="#0f172a" stroke="#0891b2"/>
+<text x="285" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#67e8f9">Embed query</text>
+<text x="285" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">same model as</text>
+<text x="285" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">indexing phase</text>
+<text x="285" y="359" text-anchor="middle" font-size="10" fill="#64748b">→ float[768]</text>
+
+<line x1="363" y1="331" x2="395" y2="331" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+<!-- Box: LanceDB search -->
+<rect x="395" y="295" width="165" height="72" rx="5" fill="#0f172a" stroke="#059669"/>
+<text x="477" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#6ee7b7">LanceDB search</text>
+<text x="477" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">cosine similarity</text>
+<text x="477" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">vs stored vectors</text>
+<text x="477" y="359" text-anchor="middle" font-size="10" fill="#64748b">.limit(3–5)</text>
+
+<line x1="560" y1="331" x2="592" y2="331" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+<!-- Box: Top-K chunks -->
+<rect x="592" y="295" width="155" height="72" rx="5" fill="#0f172a" stroke="#334155"/>
+<text x="669" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#e2e8f0">Top-K chunks</text>
+<text x="669" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">most relevant</text>
+<text x="669" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">text passages</text>
+<text x="669" y="359" text-anchor="middle" font-size="10" fill="#64748b">from your docs</text>
+
+<line x1="747" y1="331" x2="779" y2="331" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+<!-- Box: LLM -->
+<rect x="779" y="295" width="175" height="72" rx="5" fill="#0f172a" stroke="#7c3aed"/>
+<text x="866" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#c4b5fd">LLM</text>
+<text x="866" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">deepseek-r1 / mistral</text>
+<text x="866" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">prompt = query +</text>
+<text x="866" y="359" text-anchor="middle" font-size="10" fill="#64748b">retrieved context</text>
+
+<line x1="954" y1="331" x2="986" y2="331" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+<!-- Box: Answer -->
+<rect x="986" y="295" width="178" height="72" rx="5" fill="#0f2d1a" stroke="#059669" stroke-width="2"/>
+<text x="1075" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="#6ee7b7">Answer</text>
+<text x="1075" y="331" text-anchor="middle" font-size="10" fill="#94a3b8">grounded in your</text>
+<text x="1075" y="345" text-anchor="middle" font-size="10" fill="#94a3b8">actual documents</text>
+<text x="1075" y="359" text-anchor="middle" font-size="10" fill="#64748b">not hallucinated</text>
+
+<!-- Step labels -->
+<text x="106"  y="382" text-anchor="middle" font-size="9" fill="#3b82f6">① query</text>
+<text x="285"  y="382" text-anchor="middle" font-size="9" fill="#0891b2">② encode</text>
+<text x="477"  y="382" text-anchor="middle" font-size="9" fill="#059669">③ ANN search</text>
+<text x="669"  y="382" text-anchor="middle" font-size="9" fill="#64748b">④ retrieve</text>
+<text x="866"  y="382" text-anchor="middle" font-size="9" fill="#7c3aed">⑤ generate</text>
+<text x="1075" y="382" text-anchor="middle" font-size="9" fill="#059669">⑥ answer</text>
+
+<!-- Why RAG note -->
+<rect x="36" y="394" width="1148" height="40" rx="4" fill="#0f172a" stroke="#334155"/>
+<text x="600" y="410" text-anchor="middle" font-size="10" font-weight="bold" fill="#e2e8f0">Why RAG instead of just asking the LLM directly?</text>
+<text x="600" y="426" text-anchor="middle" font-size="10" fill="#94a3b8">The LLM has no knowledge of your internal documents. RAG injects the relevant text into the prompt — the LLM never needs to be fine-tuned or retrained.</text>
+
+<!-- Footer -->
+<rect x="16" y="484" width="1168" height="36" rx="5" fill="#0f172a" stroke="#1e293b"/>
+<text x="30" y="498" font-size="10" font-weight="bold" fill="#64748b">Key papers: </text>
+<text x="112" y="498" font-size="10" fill="#94a3b8">RAG original — Lewis et al. 2020 · arXiv:2005.11401    </text>
+<text x="112" y="512" font-size="10" fill="#94a3b8">Sentence-BERT — Reimers &amp; Gurevych 2019 · arXiv:1908.10084    </text>
+<text x="620" y="498" font-size="10" fill="#94a3b8">Approximate Nearest Neighbor search in LanceDB uses IVF-PQ index</text>
+<text x="620" y="512" font-size="10" fill="#94a3b8">Swedish KB-BERT trained on 3B Swedish tokens — KBLab 2020</text>
+</svg>
