@@ -251,11 +251,12 @@ pull_container_images() {
 
 # ============================================================
 # 6. llama.cpp ROCm — pre-built gfx1150 binary (lemonade-sdk)
-#    Download logic lives in text-analysis/installer (Go).
-#    Called here via: go run text-analysis/cmd/llamacpp-install --download-to DIR
+#    Bundles ROCm 7 runtime — no separate ROCm install needed.
+#    Native gfx1150 kernels — better than HSA_OVERRIDE workaround.
 # ============================================================
 download_llamacpp_rocm() {
     local dest="$BASE/archive/binaries"
+    local repo_root; repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
     info "llama.cpp ROCm gfx1150 (lemonade-sdk — bundles ROCm 7)"
 
@@ -269,23 +270,7 @@ download_llamacpp_rocm() {
     missing "  llama-*-ubuntu-rocm-gfx1150*.zip  SAKNAS"
     [[ $DRY -eq 1 ]] && return
 
-    local installer_src="$HOME/git/text-analysis"
-    if [[ -f "$installer_src/cmd/llamacpp-install/main.go" ]]; then
-        info "  Kör Go-installeraren (text-analysis/cmd/llamacpp-install)..."
-        go run "$installer_src/cmd/llamacpp-install" --download-to "$dest"
-    else
-        # Fallback: inline curl om text-analysis inte finns
-        info "  text-analysis ej tillgänglig — faller tillbaka på curl..."
-        local api="https://api.github.com/repos/lemonade-sdk/llamacpp-rocm/releases/latest"
-        local asset_url
-        asset_url=$(curl -s "$api" \
-            | grep -o '"browser_download_url": "[^"]*ubuntu-rocm-gfx1150[^"]*\.zip"' \
-            | grep -o 'https://[^"]*')
-        [[ -z "$asset_url" ]] && { echo "  Ingen gfx1150-asset hittad"; return 1; }
-        local filename; filename=$(basename "$asset_url")
-        curl -L "$asset_url" -o "$dest/$filename"
-        log "  Sparad: $filename"
-    fi
+    go run "$repo_root/cmd/llamacpp-download" --dest "$dest"
 }
 
 # ============================================================
