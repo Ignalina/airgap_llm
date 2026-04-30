@@ -250,11 +250,50 @@ pull_container_images() {
 }
 
 # ============================================================
-# 6. ROCm .deb packages — för full GPU-stack på T14s offline
+# 6. llama.cpp ROCm — pre-built gfx1150 binary (lemonade-sdk)
+#    Bundles ROCm 7 runtime — no separate ROCm install needed.
+#    Native gfx1150 kernels — better than HSA_OVERRIDE workaround.
+# ============================================================
+download_llamacpp_rocm() {
+    local dest="$BASE/archive/binaries"
+    local api="https://api.github.com/repos/lemonade-sdk/llamacpp-rocm/releases/latest"
+
+    info "llama.cpp ROCm gfx1150 (lemonade-sdk — bundles ROCm 7)"
+
+    local existing
+    existing=$(ls "$dest"/llama-*-ubuntu-rocm-gfx1150*.zip 2>/dev/null | head -1)
+    if [[ -n "$existing" ]]; then
+        skip "  $(basename "$existing")  ($(du -sh "$existing" | cut -f1))"
+        return
+    fi
+
+    missing "  llama-*-ubuntu-rocm-gfx1150*.zip  SAKNAS"
+    [[ $DRY -eq 1 ]] && return
+
+    info "  Hämtar release-info från GitHub..."
+    local asset_url
+    asset_url=$(curl -s "$api" \
+        | grep -o '"browser_download_url": "[^"]*ubuntu-rocm-gfx1150[^"]*\.zip"' \
+        | grep -o 'https://[^"]*')
+
+    if [[ -z "$asset_url" ]]; then
+        echo "  Kunde inte hitta gfx1150 Ubuntu-asset i senaste release"; return 1
+    fi
+
+    local filename
+    filename=$(basename "$asset_url")
+    info "  Laddar ner: $filename (~440 MB)..."
+    curl -L "$asset_url" -o "$dest/$filename"
+    log "  Sparad: $filename  ($(du -sh "$dest/$filename" | cut -f1))"
+}
+
+# ============================================================
+# 7. ROCm .deb packages — valfri, för andra GPU-konfigurationer
+#    (T14s: använd download_llamacpp_rocm istället — enklare)
 # ============================================================
 download_rocm_debs() {
-    local ROCM_VERSION="6.3.3"
-    local dest="$BASE/archive/apt/rocm"
+    local ROCM_VERSION="7.2.2"
+    local dest="$BASE/archive/apt/rocm-${ROCM_VERSION}"
     local count
 
     info "ROCm ${ROCM_VERSION} .deb-paket (AMD GPU-stack)"
@@ -329,6 +368,9 @@ case "$TARGET" in
     containers)
         pull_container_images
         ;;
+    llamacpp)
+        download_llamacpp_rocm
+        ;;
     rocm)
         download_rocm_debs
         ;;
@@ -338,10 +380,10 @@ case "$TARGET" in
         pull_llm_models
         download_hf_models
         pull_container_images
-        download_rocm_debs
+        download_llamacpp_rocm   # native gfx1150, replaces rocm debs for T14s
         ;;
     *)
-        echo "Användning: $0 [all|ollama|hf|containers|rocm] [--dry-run]"
+        echo "Användning: $0 [all|ollama|hf|containers|llamacpp|rocm] [--dry-run]"
         exit 1
         ;;
 esac

@@ -54,10 +54,24 @@ pip install \
     -r $BASE/python/requirements_offline.txt
 log "Python-paket installerade"
 
-# 5. ROCm (full AMD GPU stack — valfri, kräver att download_rocm_debs körts)
-ROCM_DEBS=$BASE/archive/apt/rocm
-if [[ -f "$ROCM_DEBS/Packages.gz" ]]; then
-    info "Installerar ROCm från lokal apt-repo..."
+# 5. llama-server — native gfx1150 (lemonade-sdk, bundles ROCm 7)
+LLAMA_ZIP=$(ls $BASE/archive/binaries/llama-*-ubuntu-rocm-gfx1150*.zip 2>/dev/null | head -1)
+if [[ -n "$LLAMA_ZIP" ]]; then
+    info "Installerar llama-server (native gfx1150, ROCm 7 inbyggt)..."
+    mkdir -p /opt/llamacpp-rocm
+    unzip -o "$LLAMA_ZIP" -d /opt/llamacpp-rocm/
+    chmod +x /opt/llamacpp-rocm/llama-server
+    ln -sf /opt/llamacpp-rocm/llama-server /usr/local/bin/llama-server
+    echo 'export PATH="/opt/llamacpp-rocm:$PATH"' >> ~/.bashrc
+    log "llama-server: $(llama-server --version 2>/dev/null | head -1 || echo 'klar')"
+else
+    info "llama-server zip saknas — kör: prepare_airgap.sh llamacpp"
+fi
+
+# 5b. ROCm .deb (valfri — för annan GPU-hw eller torch/candle med ROCm)
+ROCM_DEBS=$(ls -d $BASE/archive/apt/rocm-* 2>/dev/null | head -1)
+if [[ -n "$ROCM_DEBS" && -f "$ROCM_DEBS/Packages.gz" ]]; then
+    info "Installerar ROCm från lokal apt-repo ($ROCM_DEBS)..."
     echo "deb [trusted=yes] file://${ROCM_DEBS} ./" \
         > /etc/apt/sources.list.d/local-rocm.list
     apt-get update -qq
@@ -67,7 +81,7 @@ if [[ -f "$ROCM_DEBS/Packages.gz" ]]; then
     apt-get update -qq
     log "ROCm installerat"
 else
-    log "ROCm .deb-paket saknas — hoppar över (kör prepare_airgap.sh rocm för att ladda ner)"
+    info "ROCm .deb-paket saknas — hoppar över (valfri för T14s, llama-server behöver det ej)"
 fi
 
 # 6. Ollama
@@ -145,9 +159,9 @@ echo 'export TRANSFORMERS_OFFLINE=1' >> ~/.bashrc
 echo 'export HF_DATASETS_OFFLINE=1' >> ~/.bashrc
 echo 'export HF_HOME=/data/huggingface' >> ~/.bashrc
 
-# ROCm: Radeon 890M är gfx1150 (RDNA 3.5, Strix Point) — ej officiellt stödd av ROCm.
-# Överstyr till gfx1100 (RDNA 3.0) så att ROCm/HIP/torch/burn/candle hittar GPU:n.
-echo 'export HSA_OVERRIDE_GFX_VERSION=11.0.0' >> ~/.bashrc
+# HSA_OVERRIDE_GFX_VERSION sätts INTE globalt — llama-server (lemonade) har native gfx1150
+# och skulle prestera sämre med overriden. Overriden sätts bara i Ollamas systemd-service.
+# Om torch/candle/burn behöver ROCm på gfx1150, sätt overriden manuellt per process.
 echo 'export ROCR_VISIBLE_DEVICES=0' >> ~/.bashrc
 
 # 11. Verifiera
@@ -158,8 +172,9 @@ echo "════════════════════════�
 echo -n "Rust:    "; rustc --version 2>/dev/null || echo "SAKNAS — starta ny terminal"
 echo -n "Cargo:   "; cargo --version 2>/dev/null || echo "SAKNAS"
 echo -n "Python:  "; python3 --version
-echo -n "Ollama:  "; ollama --version 2>/dev/null || echo "SAKNAS"
-echo -n "DuckDB:  "; duckdb --version 2>/dev/null || echo "SAKNAS"
+echo -n "Ollama:       "; ollama --version 2>/dev/null || echo "SAKNAS"
+echo -n "llama-server: "; llama-server --version 2>/dev/null | head -1 || echo "SAKNAS"
+echo -n "DuckDB:       "; duckdb --version 2>/dev/null || echo "SAKNAS"
 echo -n "Podman:  "; podman --version 2>/dev/null || echo "EJ INSTALLERAT"
 echo ""
 echo "Ollama-modeller:"

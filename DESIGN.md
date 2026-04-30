@@ -97,10 +97,15 @@ All are open-weight — weights are public and free to run locally.
 ## ROCm note
 
 The T14s has a Radeon 890M (gfx1150, RDNA 3.5).
-ROCm does not officially support gfx1150, so we override it to gfx1100 (RDNA 3.0):
+We use **ROCm 7.2.2** pre-built .deb packages downloaded via the AMD apt repo on the online machine
+and installed offline on T14s from `archive/apt/rocm-7.2.2/`.
+
+gfx1150 is not in ROCm's official supported list, so we override to gfx1100 (RDNA 3.0):
 
 ```bash
 export HSA_OVERRIDE_GFX_VERSION=11.0.0
 ```
 
 This is set permanently in `~/.bashrc` by `install_on_t14s.sh` and in the Ollama systemd service.
+
+If ROCm 7.x adds native gfx1150 support the override can be removed, but leaving it is harmless.
