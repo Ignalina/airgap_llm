@@ -15,25 +15,32 @@ import (
 const releaseAPI = "https://api.github.com/repos/lemonade-sdk/llamacpp-rocm/releases/latest"
 
 // DownloadZip fetches the latest gfx1150 Ubuntu zip into destDir.
-// Skips if a matching file already exists. Returns the path to the zip.
+// If the file already exists and its size matches the release asset size,
+// the download is skipped. A partial download is detected and re-fetched.
+// Returns the path to the zip.
 func DownloadZip(destDir string, logFn func(string)) (string, error) {
 	logFn("Hämtar senaste lemonade release-info från GitHub...")
-	assetURL, assetName, err := latestGFX1150URL()
+	assetURL, assetName, assetSize, err := latestGFX1150Asset()
 	if err != nil {
 		return "", fmt.Errorf("release-info: %w", err)
 	}
 
 	out := filepath.Join(destDir, assetName)
-	if _, err := os.Stat(out); err == nil {
-		logFn(fmt.Sprintf("Redan nedladdad: %s", out))
-		return out, nil
+
+	if stat, err := os.Stat(out); err == nil {
+		if stat.Size() == assetSize {
+			logFn(fmt.Sprintf("Redan nedladdad, storlek OK (%d MB): %s", assetSize>>20, out))
+			return out, nil
+		}
+		logFn(fmt.Sprintf("Ofullständig fil (%d / %d MB) — laddar om...", stat.Size()>>20, assetSize>>20))
+		os.Remove(out)
 	}
 
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return "", err
 	}
 
-	logFn(fmt.Sprintf("Laddar ner %s (~440 MB)...", assetName))
+	logFn(fmt.Sprintf("Laddar ner %s (%d MB)...", assetName, assetSize>>20))
 	resp, err := http.Get(assetURL)
 	if err != nil {
 		return "", err
@@ -43,18 +50,33 @@ func DownloadZip(destDir string, logFn func(string)) (string, error) {
 		return "", fmt.Errorf("HTTP %s", resp.Status)
 	}
 
-	f, err := os.Create(out)
+	// Write to a temp file; rename on success so a partial write is never
+	// left in place with the final filename.
+	tmp := out + ".part"
+	f, err := os.Create(tmp)
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
 
-	pr := &progressReader{r: resp.Body, total: resp.ContentLength, logFn: logFn}
-	if _, err := io.Copy(f, pr); err != nil {
-		os.Remove(out)
+	pr := &progressReader{r: resp.Body, total: assetSize, logFn: logFn}
+	written, copyErr := io.Copy(f, pr)
+	f.Close()
+	if copyErr != nil {
+		os.Remove(tmp)
+		return "", copyErr
+	}
+
+	if written != assetSize {
+		os.Remove(tmp)
+		return "", fmt.Errorf("nedladdning avbruten: fick %d av %d bytes", written, assetSize)
+	}
+
+	if err := os.Rename(tmp, out); err != nil {
+		os.Remove(tmp)
 		return "", err
 	}
-	logFn(fmt.Sprintf("Sparad: %s", out))
+
+	logFn(fmt.Sprintf("Sparad: %s (%d MB)", out, written>>20))
 	return out, nil
 }
 
@@ -64,22 +86,23 @@ type githubRelease struct {
 	Assets []struct {
 		Name               string `json:"name"`
 		BrowserDownloadURL string `json:"browser_download_url"`
+		Size               int64  `json:"size"`
 	} `json:"assets"`
 }
 
-func latestGFX1150URL() (url, name string, err error) {
+func latestGFX1150Asset() (url, name string, size int64, err error) {
 	resp, err := http.Get(releaseAPI)
 	if err != nil {
-		return "", "", err
+		return "", "", 0, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", "", fmt.Errorf("GitHub API svarade %s", resp.Status)
+		return "", "", 0, fmt.Errorf("GitHub API svarade %s", resp.Status)
 	}
 
 	var rel githubRelease
 	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
-		return "", "", err
+		return "", "", 0, err
 	}
 
 	for _, a := range rel.Assets {
@@ -87,10 +110,10 @@ func latestGFX1150URL() (url, name string, err error) {
 		if strings.Contains(n, "ubuntu") &&
 			strings.Contains(n, "gfx1150") &&
 			strings.HasSuffix(n, ".zip") {
-			return a.BrowserDownloadURL, a.Name, nil
+			return a.BrowserDownloadURL, a.Name, a.Size, nil
 		}
 	}
-	return "", "", fmt.Errorf("ingen ubuntu-gfx1150.zip i senaste release")
+	return "", "", 0, fmt.Errorf("ingen ubuntu-gfx1150.zip i senaste release")
 }
 
 // --- Progress ---------------------------------------------------------
