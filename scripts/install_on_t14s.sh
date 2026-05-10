@@ -5,7 +5,7 @@
 # ============================================================
 set -euo pipefail
 
-BASE=/media/rickard/T9/airgap
+BASE=/var/run/media/rickard/T9/airgap
 GREEN='\033[0;32m'; BLUE='\033[0;34m'; NC='\033[0m'
 log()  { echo -e "${GREEN}[✓]${NC} $1"; }
 info() { echo -e "${BLUE}[→]${NC} $1"; }
@@ -19,8 +19,8 @@ log "APT klar"
 # 2. Rust
 info "Installerar Rust..."
 chmod +x $BASE/archive/toolchain/rustup-init
-RUSTUP_HOME=/usr/local/rustup \
-CARGO_HOME=/usr/local/cargo \
+export RUSTUP_HOME="$HOME/.rustup"
+export CARGO_HOME="$HOME/.cargo"
 $BASE/archive/toolchain/rustup-init \
     --no-modify-path \
     --default-toolchain stable \
@@ -43,14 +43,17 @@ log "Cargo offline konfigurerat"
 
 # 4. Python wheels
 info "Installerar Python-paket (offline)..."
+#sudo apt install python3.12 python3.12-venv
+python3 -m venv ~/venvs/airgap
+source ~/venvs/airgap/bin/activate
 pip install \
     --no-index \
     --find-links $BASE/python/wheels \
-    -r $BASE/python/requirements_offline.txt \
-    --break-system-packages 2>/dev/null || \
+    -r $BASE/python/requirements_offline.txt
+#    --break-system-packages 2>/dev/null || \
 pip install \
     --no-index \
-    --find-links $BASE/python/wheels \
+    --find-links $BASE/python/wheels
     -r $BASE/python/requirements_offline.txt
 log "Python-paket installerade"
 

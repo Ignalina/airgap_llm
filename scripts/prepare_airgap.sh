@@ -12,8 +12,8 @@
 #   bash prepare_airgap.sh containers       # bara container-images
 # ============================================================
 set -euo pipefail
-
-BASE=/media/rickard/T9/airgap
+BASE=/var/run/media/rickard/T9/airgap
+#BASE=/media/rickard/T9/airgap
 GREEN='\033[0;32m'; BLUE='\033[0;34m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
 log()     { echo -e "${GREEN}[✓]${NC} $1"; }
 info()    { echo -e "${BLUE}[→]${NC} $1"; }
@@ -28,185 +28,173 @@ for arg in "$@"; do
 done
 [[ $DRY -eq 1 ]] && echo -e "${YELLOW}DRY RUN — ingenting laddas ner${NC}\n"
 
+
+download_python_wheels() {
+    info "Python wheels (offline cache)"
+
+    mkdir -p $BASE/python/wheels
+
+    pip download \
+        --dest $BASE/python/wheels \
+        -r $BASE/python/requirements_offline.txt
+}
+
 # ============================================================
 # 1. Ollama — installera binären och spara till arkivet
 # ============================================================
 download_ollama() {
-    info "Ollama-binärer"
+    info "Ollama (airgap install)"
 
     local dest="$BASE/archive/binaries"
+    local tmp_cpu="/tmp/ollama/cpu"
+    local cpu_tar="ollama-linux-amd64.tar.zst"
+    local rocm_tar="ollama-linux-amd64-rocm.tar.zst"
+
+    mkdir -p "$dest"
+    mkdir -p "$tmp_cpu"
 
     check_file() {
         local file=$1 url=$2
+
         if [[ -f "$dest/$file" ]]; then
-            skip "  $file  (finns redan, $(du -sh "$dest/$file" | cut -f1))"
+            skip "  $file (cached)"
         else
-            missing "  $file  SAKNAS"
-            [[ $DRY -eq 0 ]] && { curl -L "$url" -o "$dest/$file"; log "  Sparad: $file"; }
+            missing "  $file"
+            [[ $DRY -eq 0 ]] && curl -L "$url" -o "$dest/$file"
         fi
     }
 
-    check_file "ollama-linux-amd64.tar.zst"      "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64.tar.zst"
-    check_file "ollama-linux-amd64-rocm.tar.zst" "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64-rocm.tar.zst"
+    # ============================================================
+    # 1. Ladda båda (airgap cache)
+    # ============================================================
+    check_file "$cpu_tar"  "https://github.com/ollama/ollama/releases/latest/download/$cpu_tar"
+    check_file "$rocm_tar" "https://github.com/ollama/ollama/releases/latest/download/$rocm_tar"
 
-    # Always reinstall from the freshly downloaded tarball and restart server
-    if [[ $DRY -eq 0 ]]; then
-        pkill ollama 2>/dev/null || true
-        sleep 1
-        tar --zstd -C /usr -xf "$dest/ollama-linux-amd64.tar.zst"
-        log "  Ollama installerat: $(ollama --version 2>/dev/null | head -1)"
-    else
-        if command -v ollama &>/dev/null; then
-            skip "  ollama installerat: $(ollama --version 2>/dev/null | head -1)"
-        else
-            missing "  ollama ej installerat lokalt"
-        fi
-    fi
+    [[ $DRY -ne 0 ]] && return
+
+    # ============================================================
+    # 2. CPU runtime ONLY (unpack)
+    # ============================================================
+    rm -rf "$tmp_cpu"
+    mkdir -p "$tmp_cpu"
+
+    info "Packar upp CPU runtime..."
+    tar --zstd -xf "$dest/$cpu_tar" -C "$tmp_cpu"
+
+    chmod +x "$tmp_cpu/bin/ollama"
+
+    # ============================================================
+    # 3. ROCm = ONLY AIRGAP STORE (NO UNPACK)
+    # ============================================================
+    cp "$dest/$rocm_tar" "$BASE/archive"
+
+    # ============================================================
+    # 4. USER BIN SYMLINK
+    # ============================================================
+    ln -sf "$tmp_cpu/bin/ollama" "$HOME/.local/bin/ollama"
+
+
+    log "Ollama aktiv: $HOME/.local/bin/ollama"
+    "$HOME/.local/bin/ollama" --version 2>/dev/null || true
 }
-
-# ============================================================
-# 2. Starta Ollama-servern (om den inte redan kör)
-# ============================================================
-start_ollama() {
-    [[ $DRY -eq 1 ]] && return
-    if ollama list &>/dev/null; then
-        skip "Ollama server redan igång"
-        return
-    fi
-    info "Startar Ollama server..."
-    ollama serve &>/dev/null &
-    local tries=0
-    until ollama list &>/dev/null; do
-        sleep 2
-        tries=$((tries + 1))
-        [[ $tries -gt 15 ]] && { echo "Ollama startade inte"; exit 1; }
-    done
-    log "Ollama server igång"
-}
-
 # ============================================================
 # 3. LLM-modeller via Ollama
 # ============================================================
 pull_llm_models() {
-    info "LLM-modeller (Ollama)"
+    info "LLM-modeller (Ollama -> T9 AIRGAP)"
 
-    check_model() {
+    export OLLAMA_MODELS="$BASE/models/ollama"
+    nohup env OLLAMA_MODELS="$OLLAMA_MODELS" ollama serve >/tmp/ollama.log 2>&1 &
+
+    gguf_path() {
+        case "$1" in
+            deepseek-r1:8b)        echo "$BASE/models/ollama/deepseek-r1-8b-q4.gguf" ;;
+            deepseek-r1:14b)       echo "$BASE/models/ollama/deepseek-r1-14b-q4.gguf" ;;
+            mistral:7b)            echo "$BASE/models/ollama/mistral-7b-q4.gguf" ;;
+            sqlcoder:7b)           echo "$BASE/models/ollama/sqlcoder-7b-q5.gguf" ;;
+            *)                     echo "" ;;
+        esac
+    }
+
+    ensure_model() {
         local model=$1 desc=$2
-        if ollama list 2>/dev/null | grep -q "^${model}[: ]"; then
-            skip "  $model  ($desc)"
-        elif [[ $DRY -eq 1 ]]; then
-            missing "  $model  ($desc)"
-        else
-            info "  Laddar $model  ($desc)..."
-            ollama pull "$model"
-            log "  $model klar"
+        local gguf
+        gguf=$(gguf_path "$model")
+
+        # already installed
+        if ollama list 2>/dev/null | awk '{print $1}' | grep -qx "$model"; then
+            skip "  $model ($desc)"
+            return
         fi
+
+        # GGUF path (offline T9 source)
+        if [[ -f "$gguf" ]]; then
+            info "  creating $model from GGUF ($desc)"
+
+            cat > "/tmp/${model}.Modelfile" <<EOF
+FROM $gguf
+EOF
+
+            ollama create "$model" -f "/tmp/${model}.Modelfile"
+            return
+        fi
+
+        # online fallback
+        info "  pulling $model ($desc)"
+        ollama pull "$model"
     }
 
-    echo "  --- Reasoning ---"
-    check_model "deepseek-r1:8b"   "5 GB  — snabb reasoning"
-    check_model "deepseek-r1:14b"  "9 GB  — tung reasoning"
+    echo "--- Reasoning ---"
+    ensure_model "deepseek-r1:8b"  "snabb reasoning"
+    ensure_model "deepseek-r1:14b" "tung reasoning"
 
-    # text-analysis GPU-tiers (selectModelGPU i hardware/detector.go)
-    # Väljs automatiskt baserat på VRAM/GTT — ladda alla tiers för portabilitet.
-    echo "  --- text-analysis: GPU-modeller (llama-server / HIP) ---"
-    check_model "llama3.1:70b"        "43 GB — GPU ≥ 40 GB  (t.ex. APU 53 GB GTT)"
-    check_model "qwen2.5:32b"         "19 GB — GPU ≥ 22 GB"
-    check_model "qwen2.5:14b"         "8.5 GB — GPU ≥ 10 GB"
-    check_model "llama3.1:8b"         "4.7 GB — GPU ≥ 5 GB"
-    check_model "mistral:7b-instruct" "4.1 GB — GPU < 5 GB / CPU-fallback"
+    echo "--- GPU tiers ---"
+    ensure_model "qwen3-coder-next"        "qwen3-coder-next"
+    ensure_model "qwen2.5:32b"         "stor"
+    ensure_model "qwen2.5:14b"         "medium"
+    ensure_model "llama3.1:8b"         "liten"
+    ensure_model "mistral:7b-instruct" "fallback"
 
-    # Register a local GGUF as an Ollama model (skips registry)
-    create_from_gguf() {
-        local name=$1 gguf=$2 desc=$3
-        if ollama list 2>/dev/null | grep -q "^${name}[: ]"; then
-            skip "  $name  ($desc)"
-        elif [[ ! -f "$gguf" ]]; then
-            missing "  $name  GGUF saknas: $gguf"
-        else
-            info "  Skapar $name från lokal GGUF  ($desc)..."
-            local mf
-            mf=$(mktemp /tmp/Modelfile.XXXXXX)
-            printf 'FROM %s\n' "$gguf" > "$mf"
-            ollama create "$name" -f "$mf"
-            rm -f "$mf"
-            log "  $name klar"
-        fi
-    }
+    echo "--- general ---"
+    ensure_model "mistral:7b"       "general"
+    ensure_model "phi3:mini"        "snabb chat"
+    ensure_model "qwen2.5:3b"       "svenska liten"
+    ensure_model "nomic-embed-text" "embeddings"
 
-    echo "  --- General / SQL ---"
-    check_model "mistral:7b"  "4.5 GB — general purpose"
-    create_from_gguf "sqlcoder" \
-        "$BASE/models/ollama/sqlcoder-7b-q5.gguf" \
-        "4.5 GB — SQL-generering (lokal GGUF)"
-
-    echo "  --- Små modeller (passar 16 GB RAM) ---"
-    check_model "phi3:mini"        "2.3 GB — snabb chat"
-    check_model "qwen2.5:3b"       "2.0 GB — svenska / flerspråkigt"
-    check_model "nomic-embed-text" "0.3 GB — embeddings / RAG"
-
-    if [[ $DRY -eq 0 ]]; then
-        log "Alla LLM-modeller klara"
-        ollama list
-    fi
+    log "OLLAMA DONE -> $BASE/models/ollama"
 }
-
 # ============================================================
 # 4. HuggingFace-modeller
 # ============================================================
 download_hf_models() {
-    info "HuggingFace-modeller"
+    info "HF-modeller -> T9 AIRGAP"
 
-    local models=(
-        "KBLab/bert-base-swedish-cased:$BASE/huggingface/KBLab_bert-base-swedish-cased"
-        "KBLab/sentence-bert-swedish-cased:$BASE/huggingface/KBLab_sentence-bert-swedish-cased"
-        "defog/sqlcoder-7b-2:$BASE/huggingface/defog_sqlcoder-7b-2"
-    )
+    export HF_HOME="$BASE/huggingface"
 
-    for entry in "${models[@]}"; do
-        local repo="${entry%%:*}"
-        local dest="${entry##*:}"
-        if [[ -d "$dest" && -n "$(ls -A "$dest" 2>/dev/null)" ]]; then
-            skip "  $repo  ($(du -sh "$dest" | cut -f1))"
-        else
-            missing "  $repo  SAKNAS → $dest"
+    download_repo() {
+        local repo=$1 dir=$2
+
+        if [[ -d "$dir" && -n "$(ls -A "$dir" 2>/dev/null)" ]]; then
+            skip "  $repo (exists)"
+            return
         fi
-    done
 
-    if [[ $DRY -eq 0 ]]; then
-        if ! python3 -c "import huggingface_hub" 2>/dev/null; then
-            info "Installerar huggingface_hub..."
-            pip install huggingface_hub --quiet
-        fi
-        python3 << PYEOF
-from huggingface_hub import snapshot_download
-import os
+        info "  laddar $repo"
 
-models = [
-    ("KBLab/bert-base-swedish-cased",      "$BASE/huggingface/KBLab_bert-base-swedish-cased"),
-    ("KBLab/sentence-bert-swedish-cased",  "$BASE/huggingface/KBLab_sentence-bert-swedish-cased"),
-    ("defog/sqlcoder-7b-2",                "$BASE/huggingface/defog_sqlcoder-7b-2"),
-]
-ignore = ["*.msgpack", "*.h5", "flax_model*", "tf_model*"]
+        mkdir -p "$dir"
 
-for repo, dest in models:
-    if os.path.isdir(dest) and os.listdir(dest):
-        print(f"  [s] {repo} finns redan")
-        continue
-    print(f"  [→] Laddar {repo}...")
-    snapshot_download(
-        repo_id=repo,
-        local_dir=dest,
-        ignore_patterns=ignore,
-        local_dir_use_symlinks=False,
-        resume_download=True,
-    )
-    print(f"  [✓] Klar: {dest}")
-PYEOF
-        log "HuggingFace-modeller klara"
-    fi
+        # RESUME via huggingface cache (ingen overwrite-logik)
+        huggingface-cli download "$repo" \
+            --local-dir "$dir" \
+            --resume-download
+    }
+
+    download_repo "KBLab/bert-base-swedish-cased" "$BASE/huggingface/KBLab_bert-base-swedish-cased"
+    download_repo "KBLab/sentence-bert-swedish-cased" "$BASE/huggingface/KBLab_sentence-bert-swedish-cased"
+    download_repo "defog/sqlcoder-7b-2" "$BASE/huggingface/defog_sqlcoder-7b-2"
+
+    log "HF DONE -> $BASE/huggingface"
 }
-
 # ============================================================
 # 5. Container images med Podman
 # ============================================================
@@ -343,9 +331,11 @@ https://repo.radeon.com/rocm/apt/${ROCM_VERSION} ${CODENAME} main" \
 TARGET="${ARGS[0]:-all}"
 
 case "$TARGET" in
+    wheels)
+        download_python_wheels
+        ;;
     ollama)
         download_ollama
-        start_ollama
         pull_llm_models
         ;;
     hf)
@@ -361,8 +351,8 @@ case "$TARGET" in
         download_rocm_debs
         ;;
     all)
+        download_python_wheels
         download_ollama
-        start_ollama
         pull_llm_models
         download_hf_models
         pull_container_images
