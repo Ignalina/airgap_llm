@@ -143,23 +143,21 @@ EOF
         info "  pulling $model ($desc)"
         ollama pull "$model"
     }
+echo "--- Reasoning ---"
+ensure_model "deepseek-r1:8b"  "snabb reasoning"
+ensure_model "deepseek-r1:14b" "tung reasoning"
 
-    echo "--- Reasoning ---"
-    ensure_model "deepseek-r1:8b"  "snabb reasoning"
-    ensure_model "deepseek-r1:14b" "tung reasoning"
+echo "--- GPU tiers ---"
+ensure_model "qwen3-coder:30b"     "qwen3-coder"       # 24GB GPU sweet spot, ~17GB at Q4
+# ensure_model "qwen3-coder-next"  "qwen3-coder-next"  # multi-GPU / CPU+RAM offload only (80B total)
+ensure_model "qwen2.5:14b"         "medium"
 
-    echo "--- GPU tiers ---"
-    ensure_model "qwen3-coder-next"        "qwen3-coder-next"
-    ensure_model "qwen2.5:32b"         "stor"
-    ensure_model "qwen2.5:14b"         "medium"
-    ensure_model "llama3.1:8b"         "liten"
-    ensure_model "mistral:7b-instruct" "fallback"
-
-    echo "--- general ---"
-    ensure_model "mistral:7b"       "general"
-    ensure_model "phi3:mini"        "snabb chat"
-    ensure_model "qwen2.5:3b"       "svenska liten"
-    ensure_model "nomic-embed-text" "embeddings"
+echo "--- General ---"
+ensure_model "llama3.1:8b"         "liten"
+ensure_model "mistral:7b-instruct" "fallback"
+ensure_model "mistral:7b"          "general"
+ensure_model "phi3:mini"           "snabb chat"
+ensure_model "nomic-embed-text"    "embeddings"
 
     log "OLLAMA DONE -> $BASE/models/ollama"
 }
@@ -170,6 +168,7 @@ download_hf_models() {
     info "HF-modeller -> T9 AIRGAP"
 
     export HF_HOME="$BASE/huggingface"
+    pip install huggingface_hub[cli]
 
     download_repo() {
         local repo=$1 dir=$2

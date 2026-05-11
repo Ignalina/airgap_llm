@@ -1,0 +1,27 @@
+# Installera offline: pip install --no-index --find-links /airgap/python/wheels -r requirements_offline.txt
+# openmetadata-ingestion: används via Docker-imagen
+sentence-transformers
+transformers
+torch
+lancedb
+sdv
+ctgan
+faker
+pyarrow
+polars
+duckdb
+pyiceberg
+fastapi
+uvicorn
+pydantic
+ollama
+scikit-learn
+lightgbm
+hdbscan
+shap
+networkx
+streamlit
+altair
+httpx
+tqdm
+rich
