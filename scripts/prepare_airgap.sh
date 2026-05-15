@@ -31,6 +31,11 @@ done
 
 download_python_wheels() {
     info "Python wheels (offline cache)"
+    sudo apt install -y python3.14-venv
+
+    python3 -m venv ~/venvs/airgap
+    source ~/venvs/airgap/bin/activate
+
 
     mkdir -p $BASE/python/wheels
 
@@ -147,10 +152,23 @@ echo "--- Reasoning ---"
 ensure_model "deepseek-r1:8b"  "snabb reasoning"
 ensure_model "deepseek-r1:14b" "tung reasoning"
 
-echo "--- GPU tiers ---"
+echo "--- Coding (Rust/algo/architecture) ---"
 ensure_model "qwen3-coder:30b"     "qwen3-coder"       # 24GB GPU sweet spot, ~17GB at Q4
 # ensure_model "qwen3-coder-next"  "qwen3-coder-next"  # multi-GPU / CPU+RAM offload only (80B total)
+ensure_model "devstral:24b"        "mistral dev 24b"    # reasoning + code, ~15GB Q4
+ensure_model "codestral:22b"       "mistral code 22b"   # pure code generation, ~13GB Q4
+
+echo "--- Reasoning + architecture ---"
+ensure_model "qwen3:14b"           "qwen3 reasoning"    # strong reasoning/planning, ~9GB Q4
+ensure_model "qwen3:8b"            "qwen3 fast reason"  # lighter reasoning fallback, ~5GB Q4
 ensure_model "qwen2.5:14b"         "medium"
+
+echo "--- Threadripper / big GPU (25GB VRAM + 512GB RAM) ---"
+ensure_model "qwen3.6:35b-a3b"    "qwen3.6 MoE"        # MoE, 3B active/token, 73% SWE-Bench, fits 25GB
+ensure_model "qwen3.6:27b"        "qwen3.6 dense"       # dense, repo-level reasoning, fits 25GB
+ensure_model "qwen2.5-coder:32b"  "qwen code 32b"       # top Rust benchmarks, ~22GB Q4
+ensure_model "llama3.3:70b"       "llama 70b"            # GPU offload + RAM, strong general + code
+ensure_model "deepseek-coder-v2:16b" "deepseek code v2"  # competitive code model, MIT
 
 echo "--- General ---"
 ensure_model "llama3.1:8b"         "liten"
@@ -183,9 +201,7 @@ download_hf_models() {
         mkdir -p "$dir"
 
         # RESUME via huggingface cache (ingen overwrite-logik)
-        huggingface-cli download "$repo" \
-            --local-dir "$dir" \
-            --resume-download
+        hf download "$repo" --local-dir "$dir" 
     }
 
     download_repo "KBLab/bert-base-swedish-cased" "$BASE/huggingface/KBLab_bert-base-swedish-cased"
@@ -201,15 +217,16 @@ pull_container_images() {
     info "Container-images (Podman)"
 
     local images=(
-        "falkordb/falkordb:latest"
-        "docker.io/openmetadata/openmetadata-server:latest"
-        "docker.io/openmetadata/openmetadata-ingestion:latest"
+        "docker.io/falkordb/falkordb:latest"
+        "docker.io/openmetadata/server:1.12.8"
+        "docker.io/openmetadata/ingestion:1.12.8"
         "docker.io/postgres:16-alpine"
         "docker.io/redis:7-alpine"
     )
 
     if [[ $DRY -eq 0 ]] && ! command -v podman &>/dev/null; then
-        echo "  Podman ej installerat — hoppar över"
+        echo "  Podman ej installerat — installerar ..."
+        sudo apt install -y podman
         return
     fi
 
